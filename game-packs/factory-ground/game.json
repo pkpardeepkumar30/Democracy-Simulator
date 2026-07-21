@@ -1,0 +1,374 @@
+{
+  "schema_version": 2,
+  "id": "factory-ground-v1",
+  "title": "Factory Ground",
+  "description": "Acquire defensible land, finance a food-processing factory, earn community consent and complete environmental and utility approvals.",
+  "version": "1.1.0",
+  "campaign": {
+    "imports": [
+      { "source_id": "civic_reputation", "target_id": "community_support", "multiplier": 0.25, "min": -15, "max": 15 },
+      { "source_id": "institutional_knowledge", "target_id": "documentation", "multiplier": 0.2, "min": -12, "max": 12 },
+      { "source_id": "civic_network", "target_id": "influence", "multiplier": 0.2, "min": -10, "max": 12 }
+    ],
+    "exports": [
+      { "source_id": "integrity", "target_id": "civic_reputation", "multiplier": 0.15, "source_offset": 50, "min": -8, "max": 8 },
+      { "source_id": "documentation", "target_id": "institutional_knowledge", "multiplier": 0.1, "source_offset": 40, "min": -5, "max": 6 },
+      { "source_id": "community_support", "target_id": "civic_network", "multiplier": 0.1, "source_offset": 40, "min": -5, "max": 6 },
+      { "source_id": "community_partnership", "target_id": "civic_network", "multiplier": 3, "min": 0, "max": 6 },
+      { "source_id": "broker_dependency", "target_id": "ethical_debt", "multiplier": 3, "min": 0, "max": 9 }
+    ],
+    "won_effect": { "civic_reputation": 7, "institutional_knowledge": 7, "civic_network": 5 },
+    "lost_effect": { "civic_reputation": -3, "institutional_knowledge": 2 }
+  },
+  "environment": {
+    "world_region": "West African capital",
+    "government_level": "Municipality",
+    "political_system": "Presidential democracy",
+    "administrative_capacity": "Uneven",
+    "corruption_structure": "Land-record corruption",
+    "rule_of_law": "Unevenly enforced",
+    "media_environment": "Strong local media",
+    "civil_society_strength": "Strong resident associations",
+    "economic_condition": "High unemployment",
+    "inequality_level": "High",
+    "modifiers": ["Inflation is high", "City budget is nearly exhausted", "A major company supports the government"]
+  },
+  "mission": {
+    "title": "Open a community-supported food-processing factory",
+    "objective": "Secure finance and clear land title, zoning, environmental, utility and tax requirements without creating an unresolved community dispute.",
+    "starting_status": "The business concept is promising, but no site, financing or regulatory approvals are secured.",
+    "win_progress": 100,
+    "objective_type": "Start a business",
+    "time_horizon": "240 days before committed buyers withdraw"
+  },
+  "value_definitions": [
+    { "id": "money", "label": "Available capital", "group": "resource", "min": -50000, "max": 750000, "format": "money" },
+    { "id": "energy", "label": "Founder capacity", "group": "resource", "min": 0, "max": 100, "format": "percent" },
+    { "id": "influence", "label": "Business access", "group": "resource", "min": 0, "max": 100, "format": "percent" },
+    { "id": "days_remaining", "label": "Days to buyer deadline", "group": "resource", "min": 0, "max": 240, "format": "days" },
+    { "id": "progress", "label": "Legacy progress", "group": "metric", "min": 0, "max": 100, "format": "percent", "hidden_from_hud": true },
+    { "id": "documentation", "label": "Project evidence", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "community_support", "label": "Public support", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "public_attention", "label": "Media pressure", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "integrity", "label": "Regulatory integrity", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "land_control", "label": "Secure land control", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "financing", "label": "Committed financing", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "permits", "label": "Municipal permits", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "environmental_clearance", "label": "Environmental clearance", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "utility_readiness", "label": "Utility readiness", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "dispute_risk", "label": "Land dispute risk", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "permit_denial", "label": "Final permit denial", "group": "metric", "min": 0, "max": 100, "format": "percent", "hidden_from_hud": true },
+    { "id": "finance_collapse", "label": "Finance collapse", "group": "metric", "min": 0, "max": 100, "format": "percent", "hidden_from_hud": true },
+    { "id": "business_plan_ready", "label": "Business plan ready", "group": "metric", "min": 0, "max": 1, "format": "number", "hidden_from_hud": true }
+  ],
+  "hidden_variable_definitions": [
+    { "id": "title_clarity", "min": 25, "max": 90 },
+    { "id": "broker_network", "min": 20, "max": 90 },
+    { "id": "bank_risk_appetite", "min": 20, "max": 85 },
+    { "id": "community_resistance", "min": 15, "max": 85 },
+    { "id": "agency_capacity", "min": 25, "max": 85 },
+    { "id": "currency_stability", "min": 20, "max": 80 }
+  ],
+  "institutions": [
+    { "id": "land_registry", "name": "Capital Land Registry", "institution_type": "Land registry", "description": "Searches title, records transfers and flags competing claims." },
+    { "id": "municipality", "name": "Kitala Metropolitan Authority", "institution_type": "Municipal office", "description": "Controls zoning, construction and operating approvals." },
+    { "id": "environment_agency", "name": "Coastal Environment Agency", "institution_type": "Environmental agency", "description": "Reviews water, waste, traffic and community impacts." },
+    { "id": "utility", "name": "Kitala Power and Water", "institution_type": "Utility company", "description": "Assesses grid, water and wastewater connections." },
+    { "id": "tax_office", "name": "Enterprise Revenue Office", "institution_type": "Tax authority", "description": "Registers the company and verifies tax compliance." },
+    { "id": "commercial_bank", "name": "Union Development Bank", "institution_type": "Bank", "description": "Provides equipment and construction finance against verified security." }
+  ],
+  "stakeholders": [
+    { "id": "landowners", "name": "Abeni Family Landholders", "archetype": "Landowner", "interests": ["fair price", "recognized family rights"], "fears": ["fraudulent transfer", "forced displacement"], "public_description": "Several family branches claim authority to negotiate the site." },
+    { "id": "community_leader", "name": "Chair Ama Nwosu", "archetype": "Community elder", "interests": ["jobs", "safe water", "local contracts"], "fears": ["pollution", "unkept promises"], "public_description": "The elected neighborhood chair can convene residents and negotiate a benefit agreement." },
+    { "id": "bank", "name": "Credit Director Kojo Essien", "archetype": "Business lobby", "institution_id": "commercial_bank", "interests": ["bankable plan", "secure title", "buyer contracts"], "fears": ["currency shock", "land litigation"], "public_description": "The bank will finance only after core risks are documented." },
+    { "id": "broker", "name": "Tariq Mensa", "archetype": "Local broker", "interests": ["commission", "continued gatekeeper role"], "fears": ["transparent auction", "registry audit"], "public_description": "A connected broker offers speed but cannot guarantee lawful title." },
+    { "id": "environment_official", "name": "Dr. Nia Baako", "archetype": "Efficient reformer", "institution_id": "environment_agency", "interests": ["credible impact controls", "public consultation"], "fears": ["political override", "unsafe discharge"], "public_description": "The reviewing scientist values early, transparent mitigation." },
+    { "id": "utility_engineer", "name": "Engineer Mosi Ade", "archetype": "Honest but overloaded official", "institution_id": "utility", "interests": ["feasible connections", "cost recovery"], "fears": ["grid overload"], "public_description": "Utility capacity exists, but extensions require co-financing and planning." }
+  ],
+  "barriers": [
+    { "id": "conflicting_title", "title": "Conflicting land records", "barrier_type": "Conflicting records", "description": "Survey plans and family claims may not agree with the registry." },
+    { "id": "zoning_change", "title": "Industrial zoning review", "barrier_type": "Policy change", "description": "The city is revising land-use rules near residential areas." },
+    { "id": "environmental_approval", "title": "Environmental approval", "barrier_type": "Environmental approval", "description": "Food processing requires waste, water and traffic mitigation." },
+    { "id": "infrastructure_shortage", "title": "Limited utility capacity", "barrier_type": "Budget freeze", "description": "The grid and water network need an extension to serve the site." }
+  ],
+  "random_events": [
+    {
+      "id": "competing_claimant",
+      "title": "A competing claimant appears",
+      "message": "A second family branch files a competing claim over part of the proposed site.",
+      "chance_per_turn": 0.09,
+      "once": true,
+      "conditions": [{ "metric": "land_control", "min": 20 }, { "metric": "title_clarity", "max": 55 }],
+      "effect": { "values": { "dispute_risk": 24, "land_control": -10 }, "resources": { "days_remaining": -12 }, "documentation": 4 },
+      "visual_event": { "focus_location_id": "site", "animation": "title-challenge", "effect": "danger" }
+    },
+    {
+      "id": "currency_shock",
+      "title": "Currency depreciation raises equipment costs",
+      "message": "Imported equipment becomes more expensive and the bank asks for a larger equity contribution.",
+      "chance_per_turn": 0.07,
+      "once": true,
+      "conditions": [{ "metric": "financing", "min": 25 }, { "metric": "currency_stability", "max": 45 }],
+      "effect": { "values": { "financing": -15 }, "resources": { "money": -18000 }, "progress": -4 },
+      "visual_event": { "focus_location_id": "bank", "animation": "currency-shock", "effect": "setback" }
+    },
+    {
+      "id": "community_partnership_offer",
+      "title": "Community cooperative proposes a partnership",
+      "message": "A neighborhood cooperative offers local investment and workers in exchange for transparent benefits and oversight.",
+      "chance_per_turn": 0.08,
+      "once": true,
+      "conditions": [{ "metric": "community_support", "min": 55 }, { "metric": "integrity", "min": 70 }],
+      "effect": { "values": { "financing": 12 }, "community_support": 12, "resources": { "influence": 5 }, "consequences": { "community_partnership": 1 } },
+      "visual_event": { "focus_location_id": "community", "animation": "partnership-offer", "effect": "support" }
+    },
+    {
+      "id": "permit_freeze",
+      "title": "Municipal permit freeze",
+      "message": "A procurement scandal temporarily freezes new industrial permits while files are audited.",
+      "chance_per_turn": 0.06,
+      "once": true,
+      "conditions": [{ "metric": "permits", "min": 20, "max": 80 }],
+      "effect": { "resources": { "days_remaining": -16, "energy": -4 }, "values": { "permits": -6 } },
+      "visual_event": { "focus_location_id": "city_hall", "animation": "permit-freeze", "effect": "setback" }
+    }
+  ],
+  "endings": [
+    { "id": "community_factory", "title": "Community-partnered factory opens", "message": "The factory opens with secure title, complete approvals and a binding community benefit partnership.", "status": "won", "conditions": [{ "metric": "land_control", "min": 75 }, { "metric": "financing", "min": 70 }, { "metric": "permits", "min": 70 }, { "metric": "environmental_clearance", "min": 65 }, { "metric": "utility_readiness", "min": 65 }, { "metric": "community_support", "min": 55 }] },
+    { "id": "factory_opens", "title": "Factory opens", "message": "The food-processing factory completes its lawful approvals, financing and utility connections and begins production.", "status": "won", "conditions": [{ "metric": "land_control", "min": 75 }, { "metric": "financing", "min": 70 }, { "metric": "permits", "min": 70 }, { "metric": "environmental_clearance", "min": 65 }, { "metric": "utility_readiness", "min": 65 }] },
+    { "id": "land_dispute", "title": "Land dispute blocks the project", "message": "Competing claims and unresolved records make the site legally unusable.", "status": "lost", "conditions": [{ "metric": "dispute_risk", "min": 100 }] },
+    { "id": "permit_denied", "title": "Permit denied", "message": "The final industrial permit is denied because core zoning or environmental defects remain unresolved.", "status": "lost", "conditions": [{ "metric": "permit_denial", "min": 100 }] },
+    { "id": "finance_collapse", "title": "Finance collapses", "message": "The financing package collapses and committed buyers withdraw.", "status": "lost", "conditions": [{ "metric": "finance_collapse", "min": 100 }] },
+    { "id": "buyer_deadline", "title": "Buyer deadline expires", "message": "The buyer commitments expire before the factory is ready to open.", "status": "lost", "conditions": [{ "metric": "days_remaining", "max": 0 }] },
+    { "id": "founder_exhaustion", "title": "Founder exhaustion", "message": "The founder can no longer coordinate the land, finance and regulatory process.", "status": "lost", "conditions": [{ "metric": "energy", "max": 0 }] }
+  ],
+  "visual_theme": {
+    "id": "coastal_enterprise",
+    "layout": "civic_city_map",
+    "primary_color": "#17463c",
+    "accent_color": "#d59b32",
+    "background_color": "#f0e7cf",
+    "locations": [
+      { "id": "market", "label": "Central Market", "x": 18, "y": 66 },
+      { "id": "site", "label": "Proposed factory site", "x": 38, "y": 62 },
+      { "id": "community", "label": "Abeni Community Hall", "x": 30, "y": 34 },
+      { "id": "registry", "label": "Land Registry", "institution_id": "land_registry", "x": 58, "y": 28 },
+      { "id": "city_hall", "label": "Metropolitan Authority", "institution_id": "municipality", "x": 72, "y": 36 },
+      { "id": "environment", "label": "Environment Agency", "institution_id": "environment_agency", "x": 80, "y": 62 },
+      { "id": "utility", "label": "Power and Water", "institution_id": "utility", "x": 57, "y": 74 },
+      { "id": "bank", "label": "Development Bank", "institution_id": "commercial_bank", "x": 46, "y": 18 },
+      { "id": "tax", "label": "Revenue Office", "institution_id": "tax_office", "x": 86, "y": 25 }
+    ]
+  },
+  "citizens": [
+    {
+      "id": "local_entrepreneur",
+      "name": "Esi Danquah",
+      "occupation": "Food-products entrepreneur",
+      "role": "Investor",
+      "context": "Esi understands local suppliers and community needs but must preserve limited family capital.",
+      "starting_resources": { "money": 300000, "energy": 100, "influence": 12, "days_remaining": 240 },
+      "starting_metrics": { "progress": 0, "documentation": 10, "community_support": 25, "public_attention": 3, "integrity": 100 },
+      "starting_values": { "land_control": 0, "financing": 8, "permits": 0, "environmental_clearance": 0, "utility_readiness": 0, "dispute_risk": 8, "permit_denial": 0, "finance_collapse": 0, "business_plan_ready": 0 },
+      "skills": { "business_planning": 65, "community_negotiation": 58 },
+      "relationships": { "local_suppliers": 55, "municipality": 15 },
+      "modifiers": { "action:Negotiate": 1.08 },
+      "visual": { "start_location_id": "market" }
+    },
+    {
+      "id": "diaspora_investor",
+      "name": "Kwame Bedi",
+      "occupation": "Diaspora investor",
+      "role": "Investor",
+      "context": "Kwame has more equity and banking credibility but weaker knowledge of land claims and community expectations.",
+      "starting_resources": { "money": 340000, "energy": 100, "influence": 18, "days_remaining": 240 },
+      "starting_metrics": { "progress": 0, "documentation": 16, "community_support": 8, "public_attention": 8, "integrity": 100 },
+      "starting_values": { "land_control": 0, "financing": 18, "permits": 0, "environmental_clearance": 0, "utility_readiness": 0, "dispute_risk": 14, "permit_denial": 0, "finance_collapse": 0, "business_plan_ready": 0 },
+      "skills": { "business_planning": 72, "financial_modeling": 76 },
+      "relationships": { "commercial_bank": 48, "community": 8 },
+      "modifiers": { "action:Start fundraising": 1.12 },
+      "visual": { "start_location_id": "bank" }
+    },
+    {
+      "id": "cooperative_founder",
+      "name": "Amina Okafor",
+      "occupation": "Agricultural cooperative manager",
+      "role": "Community organizer",
+      "context": "Amina brings farmer and resident trust, but the cooperative has less cash and needs outside finance.",
+      "starting_resources": { "money": 260000, "energy": 100, "influence": 14, "days_remaining": 240 },
+      "starting_metrics": { "progress": 0, "documentation": 8, "community_support": 42, "public_attention": 2, "integrity": 100 },
+      "starting_values": { "land_control": 0, "financing": 4, "permits": 0, "environmental_clearance": 0, "utility_readiness": 0, "dispute_risk": 5, "permit_denial": 0, "finance_collapse": 0, "business_plan_ready": 0 },
+      "skills": { "community_negotiation": 78, "supply_chain": 68 },
+      "relationships": { "farmers": 70, "community": 65 },
+      "modifiers": { "action:Build coalition": 1.12 },
+      "visual": { "start_location_id": "community" }
+    }
+  ],
+  "actions": [
+    {
+      "id": "prepare_business_plan",
+      "title": "Prepare a bankable business plan",
+      "description": "Document buyers, supply, equipment, cash flow, jobs and regulatory milestones.",
+      "action_type": "File application",
+      "location_id": "market",
+      "cost": { "money": 6500, "energy": 6, "influence": 0, "days": 5 },
+      "guaranteed_effect": { "documentation": 14, "values": { "business_plan_ready": 1 } },
+      "requirements": [],
+      "outcomes": [
+        { "id": "buyer_letters", "message": "Two regional buyers sign conditional purchase letters, strengthening the financing case.", "base_weight": 45, "progress_min": 7, "progress_max": 13, "effect": { "values": { "financing": 12 }, "documentation": 8 }, "conditions": [{ "metric": "bank_risk_appetite", "min": 50, "multiplier": 1.25 }], "visual_event": { "focus_location_id": "market", "animation": "buyer-contract", "effect": "progress" } },
+        { "id": "model_revised", "message": "An adviser identifies realistic cost and capacity assumptions that require a revised plan.", "base_weight": 40, "progress_min": 3, "progress_max": 7, "effect": { "documentation": 6, "resources": { "days_remaining": -4 } }, "conditions": [], "visual_event": { "focus_location_id": "market", "animation": "plan-review", "effect": "neutral" } },
+        { "id": "costs_understated", "message": "The first plan understates utility and waste-treatment costs and loses credibility with lenders.", "base_weight": 15, "progress_min": 0, "progress_max": 3, "effect": { "values": { "financing": -5 }, "resources": { "money": -3000 } }, "conditions": [{ "metric": "documentation", "max": 20, "multiplier": 1.5 }], "visual_event": { "focus_location_id": "market", "animation": "plan-rejected", "effect": "setback" } }
+      ]
+    },
+    {
+      "id": "secure_finance",
+      "title": "Negotiate development finance",
+      "description": "Present the plan, buyer commitments, equity and a staged risk-control package to the bank.",
+      "action_type": "Start fundraising",
+      "location_id": "bank",
+      "cost": { "money": 5000, "energy": 7, "influence": 2, "days": 6 },
+      "guaranteed_effect": { "documentation": 3, "values": { "financing": 8 } },
+      "requirements": [{ "metric": "business_plan_ready", "min": 1, "message": "The bank needs a completed business plan." }, { "metric": "documentation", "min": 20, "message": "The bank needs documented buyer demand." }],
+      "outcomes": [
+        { "id": "term_sheet", "message": "The bank issues a conditional term sheet tied to secure title and final approvals.", "base_weight": 42, "progress_min": 8, "progress_max": 14, "effect": { "values": { "financing": 35 } }, "conditions": [{ "metric": "bank_risk_appetite", "min": 50, "multiplier": 1.5 }, { "metric": "documentation", "min": 55, "multiplier": 1.25 }], "visual_event": { "focus_location_id": "bank", "animation": "term-sheet", "effect": "finance" } },
+        { "id": "more_equity_required", "message": "The bank remains interested but requires more equity and stronger title evidence.", "base_weight": 42, "progress_min": 3, "progress_max": 7, "effect": { "values": { "financing": 15 }, "resources": { "money": -8000 } }, "conditions": [], "visual_event": { "focus_location_id": "bank", "animation": "conditional-finance", "effect": "neutral" } },
+        { "id": "credit_declined", "message": "The credit committee declines the proposal until land and environmental risks are reduced.", "base_weight": 16, "progress_min": 0, "progress_max": 2, "effect": { "values": { "financing": -8 }, "resources": { "energy": -3, "days_remaining": -5 } }, "conditions": [{ "metric": "dispute_risk", "min": 45, "multiplier": 1.8 }], "visual_event": { "focus_location_id": "bank", "animation": "credit-declined", "effect": "setback" } }
+      ]
+    },
+    {
+      "id": "search_land",
+      "title": "Compare lawful land options",
+      "description": "Review purchase, lease and development-allocation sites against price, access and community rights.",
+      "action_type": "Conduct survey",
+      "location_id": "site",
+      "cost": { "money": 8500, "energy": 8, "influence": 0, "days": 7 },
+      "guaranteed_effect": { "documentation": 8, "values": { "land_control": 6 } },
+      "requirements": [{ "metric": "business_plan_ready", "min": 1, "message": "Clarify the factory's space, logistics and utility requirements first." }],
+      "outcomes": [
+        { "id": "suitable_lease", "message": "A long lease on serviced land offers a defensible route with manageable community impact.", "base_weight": 40, "progress_min": 8, "progress_max": 14, "effect": { "values": { "land_control": 22, "dispute_risk": -5 }, "community_support": 3 }, "conditions": [{ "metric": "title_clarity", "min": 55, "multiplier": 1.4 }], "visual_event": { "focus_location_id": "site", "animation": "site-selected", "effect": "land" } },
+        { "id": "promising_but_unserviced", "message": "A lower-cost site is promising but requires a costly power and water extension.", "base_weight": 43, "progress_min": 4, "progress_max": 9, "effect": { "values": { "land_control": 12, "utility_readiness": -5 }, "documentation": 4 }, "conditions": [], "visual_event": { "focus_location_id": "site", "animation": "site-survey", "effect": "neutral" } },
+        { "id": "broker_site", "message": "A broker promotes cheap land whose boundaries do not match the registry map.", "base_weight": 17, "progress_min": 0, "progress_max": 3, "effect": { "values": { "dispute_risk": 15 }, "resources": { "money": -4000 } }, "conditions": [{ "metric": "broker_network", "min": 60, "multiplier": 1.5 }], "visual_event": { "focus_location_id": "site", "animation": "boundary-conflict", "effect": "danger" } }
+      ]
+    },
+    {
+      "id": "verify_title",
+      "title": "Verify and register land title",
+      "description": "Commission a survey, search historic records, notify claimants and register the lawful interest.",
+      "action_type": "Submit evidence",
+      "location_id": "registry",
+      "cost": { "money": 16000, "energy": 9, "influence": 0, "days": 10 },
+      "guaranteed_effect": { "documentation": 12, "values": { "land_control": 8, "dispute_risk": -8 } },
+      "requirements": [{ "metric": "land_control", "min": 10, "message": "Select a specific site before commissioning full title verification." }],
+      "outcomes": [
+        { "id": "clean_registration", "message": "Survey, registry and family authority align; the lease is registered with notice to all claimants.", "base_weight": 38, "progress_min": 12, "progress_max": 20, "effect": { "values": { "land_control": 38, "dispute_risk": -18 }, "integrity": 3 }, "conditions": [{ "metric": "title_clarity", "min": 60, "multiplier": 1.65 }, { "metric": "documentation", "min": 50, "multiplier": 1.2 }], "visual_event": { "focus_location_id": "registry", "animation": "title-registered", "effect": "breakthrough" } },
+        { "id": "curable_gap", "message": "The search finds an old unregistered inheritance that can be cured with additional consents.", "base_weight": 43, "progress_min": 5, "progress_max": 10, "effect": { "values": { "land_control": 18, "dispute_risk": 5 }, "resources": { "days_remaining": -10 } }, "conditions": [], "visual_event": { "focus_location_id": "registry", "animation": "record-gap", "effect": "neutral" } },
+        { "id": "serious_conflict", "message": "The registry reveals an overlapping allocation and an active claimant with strong documents.", "base_weight": 19, "progress_min": 0, "progress_max": 3, "effect": { "values": { "land_control": -8, "dispute_risk": 32 }, "resources": { "money": -7000, "energy": -4 } }, "conditions": [{ "metric": "title_clarity", "max": 45, "multiplier": 1.8 }], "visual_event": { "focus_location_id": "registry", "animation": "conflicting-title", "effect": "danger" } }
+      ]
+    },
+    {
+      "id": "community_agreement",
+      "title": "Negotiate a community benefit agreement",
+      "description": "Discuss jobs, traffic, water protection, local suppliers, grievance handling and public monitoring.",
+      "action_type": "Negotiate",
+      "location_id": "community",
+      "cost": { "money": 9000, "energy": 10, "influence": 0, "days": 6 },
+      "guaranteed_effect": { "community_support": 14, "integrity": 3, "documentation": 4 },
+      "requirements": [{ "metric": "land_control", "min": 15, "message": "Residents need a concrete site and project proposal to negotiate." }],
+      "outcomes": [
+        { "id": "benefit_agreement", "message": "Residents approve a monitored jobs, water and local-procurement agreement.", "base_weight": 44, "progress_min": 9, "progress_max": 16, "effect": { "community_support": 18, "values": { "dispute_risk": -12 }, "consequences": { "community_partnership": 1 } }, "conditions": [{ "metric": "community_resistance", "max": 50, "multiplier": 1.45 }, { "metric": "integrity", "min": 75, "multiplier": 1.25 }], "visual_event": { "focus_location_id": "community", "animation": "agreement-signed", "effect": "support" } },
+        { "id": "consultation_continues", "message": "Residents welcome jobs but request stronger wastewater and traffic guarantees.", "base_weight": 40, "progress_min": 4, "progress_max": 9, "effect": { "community_support": 8, "documentation": 5 }, "conditions": [], "visual_event": { "focus_location_id": "community", "animation": "public-meeting", "effect": "neutral" } },
+        { "id": "community_opposition", "message": "Residents organize against the site after rumors that wastewater will enter a local stream.", "base_weight": 16, "progress_min": 0, "progress_max": 3, "effect": { "community_support": -16, "public_attention": 10, "values": { "dispute_risk": 8 } }, "conditions": [{ "metric": "community_resistance", "min": 65, "multiplier": 1.7 }], "visual_event": { "focus_location_id": "community", "animation": "community-protest", "effect": "danger" } }
+      ]
+    },
+    {
+      "id": "zoning_permit",
+      "title": "Apply for zoning and construction approval",
+      "description": "Submit site control, plans, traffic study, fire design and public-consultation record.",
+      "action_type": "File application",
+      "location_id": "city_hall",
+      "cost": { "money": 18000, "energy": 9, "influence": 0, "days": 10 },
+      "guaranteed_effect": { "documentation": 8, "values": { "permits": 10 } },
+      "requirements": [{ "metric": "land_control", "min": 45, "message": "The municipality requires credible control of the proposed site." }, { "metric": "documentation", "min": 40, "message": "Complete the site and project due-diligence file first." }],
+      "outcomes": [
+        { "id": "conditional_zoning", "message": "The city grants conditional industrial zoning subject to environmental and utility sign-off.", "base_weight": 44, "progress_min": 10, "progress_max": 17, "effect": { "values": { "permits": 42 } }, "conditions": [{ "metric": "community_support", "min": 50, "multiplier": 1.35 }, { "metric": "agency_capacity", "min": 50, "multiplier": 1.2 }], "visual_event": { "focus_location_id": "city_hall", "animation": "permit-stamped", "effect": "permit" } },
+        { "id": "technical_revisions", "message": "Reviewers request a safer truck route and revised fire-access drawings.", "base_weight": 42, "progress_min": 4, "progress_max": 9, "effect": { "values": { "permits": 18 }, "documentation": 5, "resources": { "days_remaining": -8 } }, "conditions": [], "visual_event": { "focus_location_id": "city_hall", "animation": "plan-revisions", "effect": "neutral" } },
+        { "id": "zoning_rejected", "message": "The planning committee rejects the current layout because residential buffers are inadequate.", "base_weight": 14, "progress_min": 0, "progress_max": 3, "effect": { "values": { "permit_denial": 35 }, "resources": { "money": -6000, "days_remaining": -12 } }, "conditions": [{ "metric": "community_support", "max": 25, "multiplier": 1.8 }], "visual_event": { "focus_location_id": "city_hall", "animation": "permit-rejected", "effect": "setback" } }
+      ]
+    },
+    {
+      "id": "environmental_review",
+      "title": "Complete environmental review",
+      "description": "Assess wastewater, water demand, noise and traffic and commit to monitored mitigation.",
+      "action_type": "Seek expert report",
+      "location_id": "environment",
+      "cost": { "money": 24000, "energy": 8, "influence": 0, "days": 12 },
+      "guaranteed_effect": { "documentation": 10, "integrity": 3, "values": { "environmental_clearance": 10 } },
+      "requirements": [{ "metric": "land_control", "min": 35, "message": "Environmental review requires a defined site." }, { "metric": "documentation", "min": 35, "message": "Provide process, site and production details for impact modeling." }],
+      "outcomes": [
+        { "id": "clearance_with_monitoring", "message": "The agency approves the project with wastewater monitoring and public compliance reports.", "base_weight": 45, "progress_min": 11, "progress_max": 18, "effect": { "values": { "environmental_clearance": 45 }, "community_support": 7 }, "conditions": [{ "metric": "integrity", "min": 75, "multiplier": 1.35 }, { "metric": "community_support", "min": 45, "multiplier": 1.25 }], "visual_event": { "focus_location_id": "environment", "animation": "environment-approved", "effect": "permit" } },
+        { "id": "mitigation_required", "message": "The agency requires additional treatment capacity and a revised stormwater plan.", "base_weight": 42, "progress_min": 4, "progress_max": 9, "effect": { "values": { "environmental_clearance": 20 }, "resources": { "money": -10000, "days_remaining": -10 }, "documentation": 5 }, "conditions": [], "visual_event": { "focus_location_id": "environment", "animation": "mitigation-plan", "effect": "neutral" } },
+        { "id": "impact_unacceptable", "message": "The current site plan poses unacceptable water and traffic impacts and cannot be approved.", "base_weight": 13, "progress_min": 0, "progress_max": 2, "effect": { "values": { "permit_denial": 45, "environmental_clearance": -8 }, "community_support": -10 }, "conditions": [{ "metric": "community_support", "max": 25, "multiplier": 1.5 }], "visual_event": { "focus_location_id": "environment", "animation": "impact-denied", "effect": "danger" } }
+      ]
+    },
+    {
+      "id": "utility_connections",
+      "title": "Secure power, water and wastewater connections",
+      "description": "Fund a feasible connection design and agree on construction and service milestones.",
+      "action_type": "Negotiate",
+      "location_id": "utility",
+      "cost": { "money": 28000, "energy": 7, "influence": 0, "days": 10 },
+      "guaranteed_effect": { "documentation": 4, "values": { "utility_readiness": 10 } },
+      "requirements": [{ "metric": "land_control", "min": 50, "message": "The utility needs secure site control." }, { "metric": "permits", "min": 25, "message": "Obtain preliminary municipal approval before reserving utility capacity." }],
+      "outcomes": [
+        { "id": "capacity_reserved", "message": "The utility reserves capacity and approves a co-financed extension schedule.", "base_weight": 43, "progress_min": 10, "progress_max": 16, "effect": { "values": { "utility_readiness": 45 } }, "conditions": [{ "metric": "agency_capacity", "min": 55, "multiplier": 1.4 }, { "metric": "financing", "min": 50, "multiplier": 1.25 }], "visual_event": { "focus_location_id": "utility", "animation": "grid-connected", "effect": "utility" } },
+        { "id": "shared_extension", "message": "The utility proposes a shared extension with nearby businesses, reducing cost but adding coordination time.", "base_weight": 43, "progress_min": 5, "progress_max": 10, "effect": { "values": { "utility_readiness": 24 }, "resources": { "money": 5000, "days_remaining": -10 } }, "conditions": [], "visual_event": { "focus_location_id": "utility", "animation": "shared-extension", "effect": "neutral" } },
+        { "id": "capacity_unavailable", "message": "The nearest grid feeder is overloaded and no funded upgrade is scheduled.", "base_weight": 14, "progress_min": 0, "progress_max": 3, "effect": { "values": { "utility_readiness": -5 }, "resources": { "money": -8000, "days_remaining": -12 } }, "conditions": [{ "metric": "agency_capacity", "max": 40, "multiplier": 1.7 }], "visual_event": { "focus_location_id": "utility", "animation": "grid-overload", "effect": "setback" } }
+      ]
+    },
+    {
+      "id": "final_registration",
+      "title": "Complete tax and operating registration",
+      "description": "Register the company, beneficial owners, workforce plan and final operating compliance file.",
+      "action_type": "File application",
+      "location_id": "tax",
+      "cost": { "money": 12000, "energy": 6, "influence": 0, "days": 8 },
+      "guaranteed_effect": { "documentation": 6, "integrity": 2, "progress": 5 },
+      "requirements": [{ "metric": "land_control", "min": 42, "message": "Final registration needs defensible site control." }, { "metric": "financing", "min": 40, "message": "Show committed financing for construction and operations." }, { "metric": "permits", "min": 38, "message": "Complete the main municipal approvals first." }, { "metric": "environmental_clearance", "min": 35, "message": "Environmental conditions must be substantially complete." }, { "metric": "utility_readiness", "min": 32, "message": "Demonstrate viable utility connections." }],
+      "outcomes": [
+        { "id": "operating_certificate", "message": "The company receives its operating and tax certificates and closes the financing conditions.", "base_weight": 55, "progress_min": 14, "progress_max": 22, "effect": { "values": { "land_control": 20, "financing": 25, "permits": 35, "environmental_clearance": 20, "utility_readiness": 25 } }, "conditions": [{ "metric": "documentation", "min": 75, "multiplier": 1.4 }, { "metric": "integrity", "min": 70, "multiplier": 1.25 }], "visual_event": { "focus_location_id": "site", "animation": "factory-opens", "effect": "completion" } },
+        { "id": "final_conditions", "message": "Registration is accepted subject to several final certificates and financing confirmations.", "base_weight": 35, "progress_min": 7, "progress_max": 12, "effect": { "values": { "land_control": 10, "financing": 12, "permits": 18, "environmental_clearance": 10, "utility_readiness": 12 }, "resources": { "days_remaining": -6 } }, "conditions": [], "visual_event": { "focus_location_id": "tax", "animation": "final-checklist", "effect": "progress" } },
+        { "id": "ownership_query", "message": "Revenue officials pause registration over an unresolved beneficial-ownership and title inconsistency.", "base_weight": 10, "progress_min": 0, "progress_max": 3, "effect": { "values": { "dispute_risk": 18 }, "resources": { "days_remaining": -10, "energy": -4 } }, "conditions": [{ "metric": "dispute_risk", "min": 45, "multiplier": 2.0 }], "visual_event": { "focus_location_id": "tax", "animation": "registration-held", "effect": "danger" } }
+      ]
+    },
+    {
+      "id": "regroup_project_team",
+      "title": "Regroup the project team",
+      "description": "Pause applications, delegate follow-up work and restore the founder's capacity while deadlines continue.",
+      "action_type": "Wait",
+      "location_id": "market",
+      "cost": { "money": 0, "energy": 0, "influence": 0, "days": 5 },
+      "guaranteed_effect": { "resources": { "energy": 28, "money": -1500 }, "progress": -1 },
+      "requirements": [{ "metric": "energy", "max": 45, "message": "The team only needs to regroup when founder capacity is under strain." }],
+      "outcomes": [
+        { "id": "delegation_plan", "message": "A clear delegation plan restores capacity without abandoning active files.", "base_weight": 70, "progress_min": 0, "progress_max": 1, "effect": { "resources": { "energy": 6 } }, "conditions": [], "visual_event": { "focus_location_id": "market", "animation": "team-regroups", "effect": "recovery" } },
+        { "id": "costly_pause", "message": "The pause restores energy, but consultants charge for keeping several applications active.", "base_weight": 30, "progress_min": 0, "progress_max": 0, "effect": { "resources": { "money": -3500, "energy": 2 } }, "conditions": [], "visual_event": { "focus_location_id": "market", "animation": "project-pause", "effect": "neutral" } }
+      ]
+    },
+    {
+      "id": "hire_broker",
+      "title": "Hire a connected land broker",
+      "description": "Pay a broker to accelerate meetings and records. Access may improve, but dependency and dispute risks can grow.",
+      "action_type": "Hire broker",
+      "location_id": "registry",
+      "ethical_tags": ["patronage_risk", "future_expectation"],
+      "cost": { "money": 22000, "energy": 4, "influence": 0, "days": 5 },
+      "guaranteed_effect": { "integrity": -10 },
+      "requirements": [{ "metric": "business_plan_ready", "min": 1, "message": "Define the project before hiring an intermediary." }],
+      "outcomes": [
+        { "id": "legitimate_access", "message": "The broker arranges lawful meetings and helps identify the correct registry process.", "base_weight": 30, "progress_min": 7, "progress_max": 12, "effect": { "values": { "land_control": 14 }, "resources": { "influence": 5 }, "consequences": { "broker_dependency": 1 } }, "conditions": [{ "metric": "broker_network", "min": 55, "multiplier": 1.5 }], "visual_event": { "focus_location_id": "registry", "animation": "broker-introduction", "effect": "access" } },
+        { "id": "commission_without_result", "message": "The broker requests another commission but produces no verifiable title progress.", "base_weight": 45, "progress_min": 0, "progress_max": 4, "effect": { "resources": { "money": -12000, "energy": -3 }, "values": { "dispute_risk": 6 }, "consequences": { "broker_dependency": 1 } }, "conditions": [], "visual_event": { "focus_location_id": "registry", "animation": "broker-demand", "effect": "setback" } },
+        { "id": "fraudulent_allocation", "message": "The broker presents a politically connected allocation that conflicts with existing family rights.", "base_weight": 25, "progress_min": 0, "progress_max": 2, "effect": { "values": { "dispute_risk": 35 }, "integrity": -12, "resources": { "money": -10000 } }, "conditions": [{ "metric": "title_clarity", "max": 45, "multiplier": 1.6 }], "visual_event": { "focus_location_id": "site", "animation": "fraudulent-title", "effect": "danger" } }
+      ]
+    }
+  ]
+}

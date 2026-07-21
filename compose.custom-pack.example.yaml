@@ -3,6 +3,8 @@
 services:
   game:
     environment:
+      GAME_PACKS_PATH: /custom-game
+      DEFAULT_GAME_PACK_ID: ""
       GAME_PACK_PATH: /custom-game/game.json
     volumes:
       - ./my-new-game-pack:/custom-game:ro

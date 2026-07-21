@@ -36,10 +36,26 @@ type Citizen = {
 };
 
 type Scenario = {
+  id: string;
   title: string;
   description: string;
+  environment: { world_region: string; political_system: string; administrative_capacity: string };
   mission: { title: string; objective: string };
   citizens: Citizen[];
+};
+
+type ScenarioSummary = {
+  id: string;
+  title: string;
+  description: string;
+  objective_type: string;
+  world_region: string;
+  role_count: number;
+  visual_theme?: { primary_color?: string; accent_color?: string };
+};
+
+type GeneratorCatalog = {
+  difficulties: { id: string; label: string; description: string }[];
 };
 
 type Action = {
@@ -56,10 +72,12 @@ type GameEvent = {
   action_title: string;
   message: string;
   progress_change: number;
+  value_changes?: Record<string, number>;
 };
 
 type GameState = {
   id: string;
+  game_pack_id: string;
   citizen_name: string;
   citizen_context: string;
   mission_title: string;
@@ -67,10 +85,21 @@ type GameState = {
   current_status: string;
   resources: Resources;
   metrics: Metrics;
+  indicators?: Indicator[];
   status: 'active' | 'won' | 'lost';
   turn: number;
   events: GameEvent[];
   available_actions: Action[];
+};
+
+type Indicator = {
+  id: string;
+  label: string;
+  group: 'resource' | 'metric' | 'relationship' | 'skill';
+  value: number;
+  min: number;
+  max: number;
+  format: 'number' | 'percent' | 'money' | 'days';
 };
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -91,40 +120,99 @@ function money(value: number) {
   }).format(value);
 }
 
-function Meter({ label, value }: { label: string; value: number }) {
+function factorChangeText(changes: Record<string, number> | undefined, state: GameState) {
+  const indicators = new Map(
+    (state.indicators ?? [])
+      .filter((indicator) => indicator.group !== 'resource' && indicator.id !== 'progress')
+      .map((indicator) => [indicator.id, indicator]),
+  );
+  const evidenceStages = ['Unverified', 'Independently verified', 'Corroborated', 'Chain of custody confirmed', 'Legally admissible'];
+  const lines = Object.entries(changes ?? {})
+    .filter(([id, value]) => value !== 0 && indicators.has(id))
+    .map(([id, value]) => {
+      const indicator = indicators.get(id)!;
+      if (id === 'evidence_stage') return `${indicator.label} → ${evidenceStages[indicator.value] ?? `Stage ${indicator.value}`}`;
+      const signed = `${value > 0 ? '+' : ''}${value}${indicator.format === 'percent' ? '%' : ''}`;
+      const current = indicator.format === 'percent' ? `${indicator.value}%` : `${indicator.value}/${indicator.max}`;
+      return `${indicator.label} ${signed} → ${current}`;
+    });
+  return lines.length ? lines.join('\n') : 'No visible civic factor changed in this outcome.';
+}
+
+function Meter({ id, label, value, min = 0, max = 100, format = 'percent' }: { id: string; label: string; value: number; min?: number; max?: number; format?: Indicator['format'] }) {
+  const range = Math.max(1, max - min);
+  const percent = Math.max(0, Math.min(100, ((value - min) / range) * 100));
+  const evidenceStages = ['Unverified', 'Independently verified', 'Corroborated', 'Chain of custody confirmed', 'Legally admissible'];
+  const display = id === 'evidence_stage'
+    ? evidenceStages[value] ?? `Stage ${value}`
+    : format === 'percent' ? `${value}%` : `${value}/${max}`;
   return (
     <View style={styles.meterRow}>
       <View style={styles.rowBetween}>
         <Text style={styles.meterLabel}>{label}</Text>
-        <Text style={styles.meterValue}>{value}/100</Text>
+        <Text style={styles.meterValue}>{display}</Text>
       </View>
       <View style={styles.track}>
-        <View style={[styles.fill, { width: `${Math.max(0, Math.min(100, value))}%` }]} />
+        <View style={[styles.fill, { width: `${percent}%` }]} />
       </View>
     </View>
   );
 }
 
 export default function Index() {
+  const [catalog, setCatalog] = useState<ScenarioSummary[] | null>(null);
+  const [generatorCatalog, setGeneratorCatalog] = useState<GeneratorCatalog | null>(null);
+  const [difficulty, setDifficulty] = useState('standard');
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const [game, setGame] = useState<GameState | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    request<Scenario>('/api/v1/scenario')
-      .then(setScenario)
+    Promise.all([
+      request<ScenarioSummary[]>('/api/v1/scenarios'),
+      request<GeneratorCatalog>('/api/v1/scenario-generator'),
+    ])
+      .then(([scenarios, generator]) => {
+        setCatalog(scenarios);
+        setGeneratorCatalog(generator);
+      })
       .catch((reason: Error) => setError(reason.message));
   }, []);
 
   const recentEvents = useMemo(() => [...(game?.events ?? [])].reverse(), [game?.events]);
+
+  async function chooseScenario(scenarioId: string) {
+    setBusy(true);
+    try {
+      setScenario(await request<Scenario>(`/api/v1/scenarios/${scenarioId}`));
+    } catch (reason) {
+      Alert.alert('Could not load environment', reason instanceof Error ? reason.message : 'Unknown error');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function generateRandomWorld() {
+    setBusy(true);
+    try {
+      setScenario(await request<Scenario>('/api/v1/scenarios/generate', {
+        method: 'POST',
+        body: JSON.stringify({ selections: {}, difficulty, modifiers: [], randomize_unspecified: true }),
+      }));
+    } catch (reason) {
+      Alert.alert('Could not generate world', reason instanceof Error ? reason.message : 'Unknown error');
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function start(citizenId: string) {
     setBusy(true);
     try {
       setGame(await request<GameState>('/api/v1/sessions', {
         method: 'POST',
-        body: JSON.stringify({ citizen_id: citizenId }),
+        body: JSON.stringify({ scenario_id: scenario?.id, profile_id: citizenId, citizen_id: citizenId }),
       }));
     } catch (reason) {
       Alert.alert('Could not start', reason instanceof Error ? reason.message : 'Unknown error');
@@ -137,7 +225,7 @@ export default function Index() {
     if (!game || busy) return;
     setBusy(true);
     try {
-      const result = await request<{ message: string; progress_change: number; state: GameState }>(
+      const result = await request<{ message: string; progress_change: number; value_changes?: Record<string, number>; state: GameState }>(
         `/api/v1/sessions/${game.id}/actions`,
         {
           method: 'POST',
@@ -149,8 +237,8 @@ export default function Index() {
       );
       setGame(result.state);
       Alert.alert(
-        result.progress_change > 12 ? 'Major movement' : 'Outcome',
-        `${result.message}\n\n${result.progress_change >= 0 ? '+' : ''}${result.progress_change}% progress`,
+        result.state.status === 'won' ? 'Thresholds secured' : result.state.status === 'lost' ? 'Campaign ended' : 'Civic progress by factor',
+        `${result.message}\n\n${factorChangeText(result.value_changes, result.state)}`,
       );
     } catch (reason) {
       Alert.alert('Action failed', reason instanceof Error ? reason.message : 'Unknown error');
@@ -172,10 +260,57 @@ export default function Index() {
     );
   }
 
-  if (!scenario) {
+  if (!catalog) {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.center}><ActivityIndicator size="large" /></View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!scenario) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <ScrollView contentContainerStyle={styles.content}>
+          <Text style={styles.eyebrow}>WORLD-SCALE CIVIC SIMULATION</Text>
+          <Text style={styles.hero}>Choose an environment</Text>
+          <Text style={styles.body}>Political systems, institutions and civic cultures change how the same tools work.</Text>
+          {generatorCatalog ? (
+            <View style={styles.card}>
+              <Text style={styles.occupation}>SCENARIO COMPOSER</Text>
+              <Text style={styles.cardTitle}>Generate a random world</Text>
+              <Text style={styles.body}>The server composes a seeded region, political system, administration, role, objective, modifiers and visual palette.</Text>
+              <View style={styles.difficultyRow}>
+                {generatorCatalog.difficulties.map((item) => (
+                  <Pressable key={item.id} onPress={() => setDifficulty(item.id)} style={[styles.difficultyChip, difficulty === item.id && styles.difficultyChipActive]}>
+                    <Text style={[styles.difficultyText, difficulty === item.id && styles.difficultyTextActive]}>{item.label}</Text>
+                  </Pressable>
+                ))}
+              </View>
+              <Pressable disabled={busy} onPress={generateRandomWorld} style={({ pressed }) => [styles.primaryButton, pressed && styles.pressed]}>
+                <Text style={styles.primaryButtonText}>Generate world</Text>
+              </Pressable>
+            </View>
+          ) : null}
+          <View style={styles.stack}>
+            {catalog.map((item) => (
+              <View key={item.id} style={styles.card}>
+                <Text style={styles.occupation}>{item.world_region}</Text>
+                <Text style={styles.cardTitle}>{item.title}</Text>
+                <Text style={styles.body}>{item.description}</Text>
+                <Text style={styles.costLine}>{item.objective_type} · {item.role_count} player roles</Text>
+                <Pressable
+                  accessibilityRole="button"
+                  disabled={busy}
+                  onPress={() => chooseScenario(item.id)}
+                  style={({ pressed }) => [styles.primaryButton, pressed && styles.pressed]}
+                >
+                  <Text style={styles.primaryButtonText}>Explore environment</Text>
+                </Pressable>
+              </View>
+            ))}
+          </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -187,6 +322,7 @@ export default function Index() {
           <Text style={styles.eyebrow}>CIVIC SIMULATION</Text>
           <Text style={styles.hero}>{scenario.mission.title}</Text>
           <Text style={styles.body}>{scenario.description}</Text>
+          <Text style={styles.costLine}>{scenario.environment.world_region} · {scenario.environment.political_system}</Text>
           <View style={styles.stack}>
             {scenario.citizens.map((citizen) => (
               <View key={citizen.id} style={styles.card}>
@@ -207,6 +343,9 @@ export default function Index() {
               </View>
             ))}
           </View>
+          <Pressable style={styles.secondaryButton} onPress={() => setScenario(null)}>
+            <Text style={styles.secondaryButtonText}>Choose another environment</Text>
+          </Pressable>
         </ScrollView>
       </SafeAreaView>
     );
@@ -226,50 +365,46 @@ export default function Index() {
         </View>
 
         <View style={styles.resourceGrid}>
-          {[
-            ['Money', money(game.resources.money)],
-            ['Energy', String(game.resources.energy)],
-            ['Influence', String(game.resources.influence)],
-            ['Days', String(game.resources.days_remaining)],
-          ].map(([label, value]) => (
-            <View key={label} style={styles.resourceCard}>
-              <Text style={styles.resourceLabel}>{label}</Text>
-              <Text style={styles.resourceValue}>{value}</Text>
+          {(game.indicators?.filter((indicator) => indicator.group === 'resource') ?? [
+            { id: 'money', label: 'Money', group: 'resource' as const, value: game.resources.money, min: 0, max: 100, format: 'money' as const },
+            { id: 'energy', label: 'Energy', group: 'resource' as const, value: game.resources.energy, min: 0, max: 100, format: 'number' as const },
+            { id: 'influence', label: 'Influence', group: 'resource' as const, value: game.resources.influence, min: 0, max: 100, format: 'number' as const },
+            { id: 'days_remaining', label: 'Days', group: 'resource' as const, value: game.resources.days_remaining, min: 0, max: 180, format: 'days' as const },
+          ]).map((indicator) => (
+            <View key={indicator.id} style={styles.resourceCard}>
+              <Text style={styles.resourceLabel}>{indicator.label}</Text>
+              <Text style={styles.resourceValue}>{indicator.format === 'money' ? money(indicator.value) : indicator.format === 'percent' ? `${indicator.value}%` : indicator.value}</Text>
             </View>
           ))}
         </View>
 
         <View style={styles.card}>
-          <View style={styles.rowBetween}>
-            <Text style={styles.cardTitle}>Mission progress</Text>
-            <Text style={styles.cardTitle}>{game.metrics.progress}%</Text>
-          </View>
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${game.metrics.progress}%` }]} />
-          </View>
+          <Text style={styles.cardTitle}>Current situation</Text>
           <Text style={styles.status}>{game.current_status}</Text>
         </View>
 
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Civic capacity</Text>
-          <Meter label="Documentation" value={game.metrics.documentation} />
-          <Meter label="Community support" value={game.metrics.community_support} />
-          <Meter label="Public attention" value={game.metrics.public_attention} />
-          <Meter label="Integrity" value={game.metrics.integrity} />
+          {(game.indicators?.filter((indicator) => indicator.group !== 'resource' && indicator.id !== 'progress') ?? [
+            { id: 'documentation', label: 'Evidence strength', value: game.metrics.documentation, min: 0, max: 100 },
+            { id: 'community_support', label: 'Public support', value: game.metrics.community_support, min: 0, max: 100 },
+            { id: 'public_attention', label: 'Media pressure', value: game.metrics.public_attention, min: 0, max: 100 },
+            { id: 'integrity', label: 'Integrity', value: game.metrics.integrity, min: 0, max: 100 },
+          ]).map((indicator) => <Meter key={indicator.id} id={indicator.id} label={indicator.label} value={indicator.value} min={indicator.min} max={indicator.max} format={'format' in indicator ? indicator.format : 'percent'} />)}
         </View>
 
         {game.status === 'active' ? (
           <View style={styles.stack}>
             <Text style={styles.sectionTitle}>Choose the next action</Text>
-            {game.available_actions.map((action) => (
+            {game.available_actions.filter((action) => action.enabled).map((action) => (
               <Pressable
                 key={action.id}
                 accessibilityRole="button"
-                disabled={!action.enabled || busy}
+                disabled={busy}
                 onPress={() => act(action.id)}
                 style={({ pressed }) => [
                   styles.actionCard,
-                  (!action.enabled || busy) && styles.disabled,
+                  busy && styles.disabled,
                   pressed && styles.pressed,
                 ]}
               >
@@ -278,7 +413,6 @@ export default function Index() {
                 <Text style={styles.costLine}>
                   {action.cost.money ? money(action.cost.money) : ''} {action.cost.energy ? `· ${action.cost.energy} energy` : ''} {action.cost.influence ? `· ${action.cost.influence} influence` : ''} · {action.cost.days} days
                 </Text>
-                {action.disabled_reason ? <Text style={styles.warning}>{action.disabled_reason}</Text> : null}
               </Pressable>
             ))}
           </View>
@@ -298,7 +432,7 @@ export default function Index() {
             <View key={`${event.turn}-${event.action_title}`} style={styles.event}>
               <Text style={styles.eventTitle}>Turn {event.turn}: {event.action_title}</Text>
               <Text style={styles.body}>{event.message}</Text>
-              <Text style={styles.costLine}>{event.progress_change >= 0 ? '+' : ''}{event.progress_change}% progress</Text>
+              <Text style={styles.costLine}>Civic factors updated</Text>
             </View>
           ))}
         </View>
@@ -323,8 +457,15 @@ const styles = StyleSheet.create({
   card: { borderWidth: 1, borderColor: '#d9d4c8', backgroundColor: '#fffdf8', borderRadius: 18, padding: 18, gap: 10 },
   cardTitle: { color: '#17212b', fontSize: 18, fontWeight: '800' },
   occupation: { color: '#bb6b22', fontSize: 13, fontWeight: '800' },
+  difficultyRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  difficultyChip: { borderWidth: 1, borderColor: '#d9d4c8', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8 },
+  difficultyChipActive: { borderColor: '#172c3f', backgroundColor: '#172c3f' },
+  difficultyText: { color: '#5f6c77', fontSize: 13, fontWeight: '700' },
+  difficultyTextActive: { color: '#fff' },
   primaryButton: { minHeight: 46, borderRadius: 12, backgroundColor: '#172c3f', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16, marginTop: 6 },
   primaryButtonText: { color: '#fff', fontWeight: '800' },
+  secondaryButton: { minHeight: 44, borderRadius: 12, borderWidth: 1, borderColor: '#d9d4c8', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16, marginTop: 6 },
+  secondaryButtonText: { color: '#172c3f', fontWeight: '800' },
   pressed: { opacity: 0.75 },
   disabled: { opacity: 0.48 },
   costLine: { color: '#6e5b46', fontSize: 13, fontWeight: '700', lineHeight: 19 },

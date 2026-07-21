@@ -8,10 +8,18 @@ const dialogMessage = document.getElementById('dialogMessage');
 const dialogDelta = document.getElementById('dialogDelta');
 const dialogClose = document.getElementById('dialogClose');
 
+let scenarios = [];
+let generatorCatalog = null;
+let campaigns = [];
+let activeCampaignId = null;
+let campaignsSupported = true;
 let scenario = null;
 let state = null;
 let requestInFlight = false;
+let cityRenderer = null;
+let pendingVisualEvent = null;
 const sessionStorageKey = 'civic-sim-session-id';
+const campaignStorageKey = 'civic-sim-campaign-id';
 const memoryStorage = new Map();
 
 function storageGet(key) {
@@ -38,12 +46,211 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
+function destroyCityRenderer() {
+  try { cityRenderer?.destroy(); }
+  catch { /* Phaser cleanup must never block the playable DOM UI. */ }
+  cityRenderer = null;
+}
+
+function mountCityRenderer() {
+  const host = document.getElementById('cityCanvasHost');
+  const fallback = document.getElementById('cityDomFallback');
+  if (!host || typeof globalThis.CivicCityRenderer !== 'function') return;
+  try {
+    cityRenderer = new globalThis.CivicCityRenderer({
+      parent: host,
+      scenario,
+      state,
+      visualEvent: pendingVisualEvent,
+      locked: requestInFlight,
+      onAction: (actionId) => takeAction(actionId),
+    });
+    fallback?.setAttribute('hidden', '');
+  } catch (error) {
+    console.warn('Visual city unavailable; using DOM fallback.', error);
+    host.remove();
+    fallback?.removeAttribute('hidden');
+  }
+}
+
 function formatMoney(value) {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
     maximumFractionDigits: 0,
   }).format(value);
+}
+
+function applyScenarioTheme() {
+  const theme = scenario?.visual_theme;
+  document.documentElement.style.setProperty('--navy', theme?.primary_color || '#172c3f');
+  document.documentElement.style.setProperty('--saffron', theme?.accent_color || '#bb6b22');
+  document.documentElement.style.setProperty('--paper', theme?.background_color || '#f4f1e9');
+}
+
+function renderScenarioSelection() {
+  destroyCityRenderer();
+  scenario = null;
+  applyScenarioTheme();
+  newGameButton.hidden = true;
+  app.innerHTML = `
+    <section class="hero-card">
+      <p class="eyebrow">WORLD-SCALE CIVIC SIMULATION</p>
+      <h2>Choose an environment</h2>
+      <p class="lead">The same civic tools behave differently across political systems, institutions, economies and administrative cultures.</p>
+      ${campaignsSupported ? `<div class="campaign-panel">
+        <div>
+          <strong>Cross-mission campaign</strong>
+          <span>Link missions to preserve their full history and carry civic reputation, institutional knowledge and networks forward.</span>
+        </div>
+        <label><span>Current campaign</span><select id="campaignSelect">
+          <option value="">One-off mission</option>
+          ${campaigns.map((item) => `<option value="${escapeHtml(item.id)}" ${item.id === activeCampaignId ? 'selected' : ''}>${escapeHtml(item.name)} — ${item.mission_count} completed</option>`).join('')}
+        </select></label>
+        <form id="campaignForm"><input name="name" maxlength="80" required placeholder="New campaign name"><button class="button button-secondary" type="submit">Create</button></form>
+      </div>` : ''}
+      ${generatorCatalog?.templates?.length ? `<div class="generator-callout">
+        <div><strong>Compose a new world</strong><span>Choose the civic setting yourself or let the server build a seeded random environment.</span></div>
+        <button id="openGenerator" class="button button-primary" type="button">Generate world</button>
+      </div>` : ''}
+      <div class="scenario-grid">
+        ${scenarios.map((item) => `
+          <article class="scenario-card" style="--scenario-color:${escapeHtml(item.visual_theme?.primary_color || '#172c3f')};--scenario-accent:${escapeHtml(item.visual_theme?.accent_color || '#bb6b22')}">
+            <span class="occupation">${escapeHtml(item.world_region || 'Configurable environment')}</span>
+            ${item.generated ? '<span class="generated-badge">GENERATED</span>' : ''}
+            <h3>${escapeHtml(item.title)}</h3>
+            <p>${escapeHtml(item.description)}</p>
+            <div class="resource-preview">
+              <span class="chip">${escapeHtml(item.objective_type || 'Civic objective')}</span>
+              <span class="chip">${item.role_count} player roles</span>
+            </div>
+            <button class="button button-primary select-scenario" data-scenario-id="${escapeHtml(item.id)}" type="button">Explore environment</button>
+          </article>`).join('')}
+      </div>
+    </section>`;
+
+  document.querySelectorAll('.select-scenario').forEach((button) => {
+    button.addEventListener('click', () => selectScenario(button.dataset.scenarioId));
+  });
+  document.getElementById('openGenerator')?.addEventListener('click', renderGenerator);
+  document.getElementById('campaignSelect')?.addEventListener('change', (event) => {
+    activeCampaignId = event.target.value || null;
+    if (activeCampaignId) storageSet(campaignStorageKey, activeCampaignId);
+    else storageRemove(campaignStorageKey);
+  });
+  document.getElementById('campaignForm')?.addEventListener('submit', createCampaign);
+}
+
+async function createCampaign(event) {
+  event.preventDefault();
+  if (requestInFlight) return;
+  const form = event.currentTarget;
+  const name = new FormData(form).get('name');
+  requestInFlight = true;
+  try {
+    const campaign = await api('/api/v1/campaigns', { method: 'POST', body: JSON.stringify({ name }) });
+    campaigns.push({ id: campaign.id, name: campaign.name, mission_count: 0, values: {} });
+    activeCampaignId = campaign.id;
+    storageSet(campaignStorageKey, campaign.id);
+    renderScenarioSelection();
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    requestInFlight = false;
+  }
+}
+
+const generatorFields = [
+  ['world_region', 'World region'],
+  ['political_system', 'Political system'],
+  ['administrative_capacity', 'Administrative capacity'],
+  ['corruption_structure', 'Corruption structure'],
+  ['rule_of_law', 'Rule of law'],
+  ['media_environment', 'Media environment'],
+  ['player_role', 'Player role'],
+  ['objective_type', 'Civic objective'],
+];
+
+function renderGenerator() {
+  destroyCityRenderer();
+  if (!generatorCatalog) return;
+  newGameButton.hidden = true;
+  app.innerHTML = `
+    <section class="hero-card">
+      <p class="eyebrow">SCENARIO COMPOSER</p>
+      <h2>Build a civic environment</h2>
+      <p class="lead">Leave any field on Random to compose it from the abstraction library. The seed, selected values, difficulty and modifiers are stored with the generated pack.</p>
+      <form id="generatorForm" class="generator-form">
+        ${generatorFields.map(([id, label]) => `
+          <label><span>${escapeHtml(label)}</span><select name="${id}">
+            <option value="">Random</option>
+            ${(generatorCatalog.categories[id] || []).map((option) => `<option value="${escapeHtml(option.id)}">${escapeHtml(option.label)}</option>`).join('')}
+          </select></label>`).join('')}
+        <label><span>Difficulty</span><select name="difficulty">
+          ${generatorCatalog.difficulties.map((option) => `<option value="${escapeHtml(option.id)}" ${option.id === 'standard' ? 'selected' : ''}>${escapeHtml(option.label)} — ${escapeHtml(option.description)}</option>`).join('')}
+        </select></label>
+        <label><span>Seed (optional)</span><input name="seed" type="number" min="0" step="1" placeholder="Random server seed"></label>
+        <fieldset class="modifier-field"><legend>Modifiers (none means random)</legend>
+          ${generatorCatalog.modifiers.map((option) => `<label class="check-label"><input type="checkbox" name="modifier" value="${escapeHtml(option.id)}"><span>${escapeHtml(option.label)}</span></label>`).join('')}
+        </fieldset>
+        <div class="generator-actions">
+          <button class="button button-primary" type="submit">Generate selected world</button>
+          <button id="randomWorld" class="button button-secondary" type="button">Surprise me</button>
+          <button id="cancelGenerator" class="button button-secondary" type="button">Back</button>
+        </div>
+      </form>
+    </section>`;
+  document.getElementById('generatorForm').addEventListener('submit', (event) => generateWorld(event, false));
+  document.getElementById('randomWorld').addEventListener('click', (event) => generateWorld(event, true));
+  document.getElementById('cancelGenerator').addEventListener('click', renderScenarioSelection);
+}
+
+async function generateWorld(event, fullyRandom) {
+  event.preventDefault();
+  if (requestInFlight) return;
+  const form = document.getElementById('generatorForm');
+  const data = new FormData(form);
+  const selections = {};
+  if (!fullyRandom) {
+    for (const [id] of generatorFields) {
+      const value = data.get(id);
+      if (value) selections[id] = value;
+    }
+  }
+  const seedText = fullyRandom ? '' : data.get('seed');
+  const payload = {
+    selections,
+    difficulty: fullyRandom ? 'standard' : data.get('difficulty'),
+    modifiers: fullyRandom ? [] : data.getAll('modifier'),
+    randomize_unspecified: true,
+  };
+  if (seedText) payload.seed = Number(seedText);
+  requestInFlight = true;
+  form.querySelectorAll('button,select,input').forEach((control) => { control.disabled = true; });
+  try {
+    scenario = await api('/api/v1/scenarios/generate', { method: 'POST', body: JSON.stringify(payload) });
+    applyScenarioTheme();
+    renderProfileSelection();
+  } catch (error) {
+    alert(error.message);
+    renderGenerator();
+  } finally {
+    requestInFlight = false;
+  }
+}
+
+async function selectScenario(scenarioId) {
+  if (requestInFlight) return;
+  requestInFlight = true;
+  try {
+    scenario = await api(`/api/v1/scenarios/${encodeURIComponent(scenarioId)}`);
+    applyScenarioTheme();
+    renderProfileSelection();
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    requestInFlight = false;
+  }
 }
 
 function createClientActionId() {
@@ -81,12 +288,19 @@ function renderError(message) {
 }
 
 function renderProfileSelection() {
+  destroyCityRenderer();
   newGameButton.hidden = true;
   app.innerHTML = `
     <section class="hero-card">
       <p class="eyebrow">${escapeHtml(scenario.title)}</p>
       <h2>${escapeHtml(scenario.mission.title)}</h2>
       <p class="lead">${escapeHtml(scenario.description)}</p>
+      <div class="environment-strip">
+        <span>${escapeHtml(scenario.environment.world_region)}</span>
+        <span>${escapeHtml(scenario.environment.political_system)}</span>
+        <span>${escapeHtml(scenario.environment.administrative_capacity)}</span>
+      </div>
+      ${activeCampaignId ? `<p class="campaign-link">Campaign: ${escapeHtml(campaigns.find((item) => item.id === activeCampaignId)?.name || 'linked civic history')}</p>` : ''}
       <div class="profile-grid">
         ${scenario.citizens.map((citizen) => `
           <article class="profile-card">
@@ -102,11 +316,13 @@ function renderProfileSelection() {
             <button class="button button-primary select-profile" data-citizen-id="${escapeHtml(citizen.id)}" type="button">Play as ${escapeHtml(citizen.name.split(' ')[0])}</button>
           </article>`).join('')}
       </div>
+      <button id="backToScenarios" class="button button-secondary back-button" type="button">Choose another environment</button>
     </section>`;
 
   document.querySelectorAll('.select-profile').forEach((button) => {
     button.addEventListener('click', () => startSession(button.dataset.citizenId));
   });
+  document.getElementById('backToScenarios').addEventListener('click', renderScenarioSelection);
 }
 
 function costHtml(cost) {
@@ -115,22 +331,93 @@ function costHtml(cost) {
   if (cost.energy) entries.push(`<span>${cost.energy} energy</span>`);
   if (cost.influence) entries.push(`<span>${cost.influence} influence</span>`);
   if (cost.days) entries.push(`<span>${cost.days} days</span>`);
+  for (const [id, value] of Object.entries(cost.values || {})) {
+    const definition = scenario?.value_definitions?.find((item) => item.id === id);
+    entries.push(`<span>${value} ${escapeHtml(definition?.label || id)}</span>`);
+  }
   return entries.join('');
 }
 
-function metricBar(label, value) {
+function formatIndicator(indicator) {
+  if (indicator.format === 'money') return formatMoney(indicator.value);
+  if (indicator.format === 'days') return `${indicator.value}`;
+  if (indicator.format === 'percent') return `${indicator.value}%`;
+  return String(indicator.value);
+}
+
+function factorDisplay(indicator) {
+  if (indicator.id === 'evidence_stage') {
+    return ['Unverified', 'Independently verified', 'Corroborated', 'Chain of custody confirmed', 'Legally admissible'][indicator.value] || `Stage ${indicator.value}`;
+  }
+  return indicator.format === 'percent' ? `${indicator.value}%` : `${indicator.value}/${indicator.max}`;
+}
+
+function metricBar(indicator) {
+  const { label, value, min = 0, max = 100 } = indicator;
+  const range = Math.max(1, max - min);
+  const percent = Math.max(0, Math.min(100, ((value - min) / range) * 100));
   return `
     <div class="stat-row">
-      <div class="stat-header"><span>${escapeHtml(label)}</span><strong>${value}/100</strong></div>
-      <div class="mini-track"><div class="mini-fill" style="width:${Math.max(0, Math.min(100, value))}%"></div></div>
+      <div class="stat-header"><span>${escapeHtml(label)}</span><strong>${escapeHtml(factorDisplay(indicator))}</strong></div>
+      <div class="mini-track"><div class="mini-fill" style="width:${percent}%"></div></div>
     </div>`;
 }
 
+function factorChangeLines(changes, currentState = state, includeCurrentValue = false) {
+  const indicators = new Map(
+    (currentState?.indicators || [])
+      .filter((indicator) => indicator.group !== 'resource' && indicator.id !== 'progress')
+      .map((indicator) => [indicator.id, indicator]),
+  );
+  return Object.entries(changes || {})
+    .filter(([id, value]) => value !== 0 && indicators.has(id))
+    .map(([id, value]) => {
+      const indicator = indicators.get(id);
+      if (id === 'evidence_stage') return `${indicator.label} → ${factorDisplay(indicator)}`;
+      const signed = `${value > 0 ? '+' : ''}${value}${indicator.format === 'percent' ? '%' : ''}`;
+      const current = includeCurrentValue ? ` → ${factorDisplay(indicator)}` : '';
+      return `${indicator.label} ${signed}${current}`;
+    });
+}
+
+function eventChangeSummary(event) {
+  const changes = factorChangeLines(event.value_changes).slice(0, 3);
+  return changes.length ? changes.join(' · ') : 'No visible civic factor changed';
+}
+
+function cityMapHtml() {
+  const locations = scenario?.visual_theme?.locations || [];
+  const validActions = state.available_actions.filter((action) => action.enabled);
+  if (!locations.length) return '';
+  const rendererAvailable = typeof globalThis.CivicCityRenderer === 'function';
+  return `
+    <section class="panel city-panel">
+      <div class="panel-inner">
+        <div class="section-title"><h3>Civic environment</h3><span>${escapeHtml(scenario.environment.world_region)}</span></div>
+        <div class="city-map" role="group" aria-label="Scenario institutions and action locations">
+          ${rendererAvailable ? '<div id="cityCanvasHost" class="city-canvas-host" aria-hidden="true"></div>' : ''}
+          <div id="cityDomFallback" class="city-dom-fallback" ${rendererAvailable ? 'hidden' : ''}>
+            <div class="city-river" aria-hidden="true"></div>
+            ${locations.map((location) => {
+            const selectable = validActions.find((action) => action.location_id === location.id);
+            if (!selectable) return `<span class="city-location context" style="left:${location.x}%;top:${location.y}%"><span>${escapeHtml(location.label)}</span></span>`;
+            return `<button class="city-location available" style="left:${location.x}%;top:${location.y}%" type="button" ${requestInFlight ? 'disabled' : ''} data-action-id="${escapeHtml(selectable.id)}" aria-label="${escapeHtml(location.label)}: ${escapeHtml(selectable.title)}"><span>${escapeHtml(location.label)}</span></button>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    </section>`;
+}
+
 function renderGame() {
+  destroyCityRenderer();
   newGameButton.hidden = false;
   const statusClass = state.status === 'won' ? 'won' : 'lost';
   const finished = state.status !== 'active';
   const newestEvents = [...state.events].reverse();
+  const resourceIndicators = state.indicators.filter((indicator) => indicator.group === 'resource');
+  const metricIndicators = state.indicators.filter((indicator) => indicator.group !== 'resource' && indicator.id !== 'progress');
+  const validActions = state.available_actions.filter((action) => action.enabled);
 
   app.innerHTML = `
     <div class="game-layout">
@@ -147,17 +434,15 @@ function renderGame() {
           </div>
         </section>
 
+        ${cityMapHtml()}
+
         <section class="panel">
           <div class="panel-inner">
             <div class="resource-grid">
-              <div class="metric-card"><div class="label">Money</div><div class="value">${formatMoney(state.resources.money)}</div></div>
-              <div class="metric-card"><div class="label">Energy</div><div class="value">${state.resources.energy}</div></div>
-              <div class="metric-card"><div class="label">Influence</div><div class="value">${state.resources.influence}</div></div>
-              <div class="metric-card"><div class="label">Days left</div><div class="value">${state.resources.days_remaining}</div></div>
+              ${resourceIndicators.map((indicator) => `<div class="metric-card"><div class="label">${escapeHtml(indicator.label)}</div><div class="value">${escapeHtml(formatIndicator(indicator))}</div></div>`).join('')}
             </div>
             <div class="progress-section">
-              <div class="progress-heading"><span>Mission progress</span><span>${state.metrics.progress}%</span></div>
-              <div class="progress-track"><div class="progress-fill" style="width:${state.metrics.progress}%"></div></div>
+              <div class="progress-heading"><span>Current situation</span><span>${metricIndicators.length} tracked factors</span></div>
               <p class="status-text">${escapeHtml(state.current_status)}</p>
             </div>
           </div>
@@ -173,15 +458,14 @@ function renderGame() {
             <div class="panel-inner">
               <div class="section-title"><h3>Choose the next action</h3><span>Outcomes are uncertain</span></div>
               <div class="action-list">
-                ${state.available_actions.map((action) => `
-                  <button class="action-button" type="button" data-action-id="${escapeHtml(action.id)}" ${action.enabled && !requestInFlight ? '' : 'disabled'}>
+                ${validActions.map((action) => `
+                  <button class="action-button" type="button" data-action-id="${escapeHtml(action.id)}" ${requestInFlight ? 'disabled' : ''}>
                     <span>
                       <span class="action-title">${escapeHtml(action.title)}</span>
                       <span class="action-description">${escapeHtml(action.description)}</span>
                     </span>
                     <span class="action-cost">${costHtml(action.cost)}</span>
-                    ${action.disabled_reason ? `<span class="disabled-reason">${escapeHtml(action.disabled_reason)}</span>` : ''}
-                  </button>`).join('')}
+                  </button>`).join('') || '<p class="action-description">No valid action is currently available.</p>'}
               </div>
             </div>
           </section>`}
@@ -192,10 +476,7 @@ function renderGame() {
           <div class="panel-inner">
             <div class="section-title"><h3>Civic capacity</h3><span>Public knowledge</span></div>
             <div class="secondary-metrics">
-              ${metricBar('Documentation', state.metrics.documentation)}
-              ${metricBar('Community support', state.metrics.community_support)}
-              ${metricBar('Public attention', state.metrics.public_attention)}
-              ${metricBar('Integrity', state.metrics.integrity)}
+              ${metricIndicators.map(metricBar).join('')}
             </div>
           </div>
         </section>
@@ -206,9 +487,9 @@ function renderGame() {
             <div class="timeline">
               ${newestEvents.length ? newestEvents.map((event) => `
                 <article class="timeline-item">
-                  <h4>Turn ${event.turn}: ${escapeHtml(event.action_title)}</h4>
+                  <h4>Turn ${event.turn}: ${event.kind === 'random_event' ? 'World event — ' : ''}${escapeHtml(event.action_title)}</h4>
                   <p>${escapeHtml(event.message)}</p>
-                  <div class="event-meta">${event.progress_change >= 0 ? '+' : ''}${event.progress_change}% progress · ${event.resources_after.days_remaining} days left</div>
+                  <div class="event-meta">${escapeHtml(eventChangeSummary(event))} · ${event.resources_after.days_remaining} days left</div>
                 </article>`).join('') : '<p class="action-description">No official action has been taken yet.</p>'}
             </div>
           </div>
@@ -219,7 +500,12 @@ function renderGame() {
   document.querySelectorAll('.action-button[data-action-id]').forEach((button) => {
     button.addEventListener('click', () => takeAction(button.dataset.actionId));
   });
+  document.querySelectorAll('.city-location[data-action-id]').forEach((button) => {
+    button.addEventListener('click', () => takeAction(button.dataset.actionId));
+  });
   document.getElementById('restartButton')?.addEventListener('click', resetSession);
+  mountCityRenderer();
+  pendingVisualEvent = null;
 }
 
 async function startSession(citizenId) {
@@ -228,7 +514,7 @@ async function startSession(citizenId) {
   try {
     const created = await api('/api/v1/sessions', {
       method: 'POST',
-      body: JSON.stringify({ citizen_id: citizenId }),
+      body: JSON.stringify({ scenario_id: scenario.id, profile_id: citizenId, citizen_id: citizenId, campaign_id: activeCampaignId }),
     });
     state = created;
     storageSet(sessionStorageKey, state.id);
@@ -254,11 +540,17 @@ async function takeAction(actionId) {
       }),
     });
     state = result.state;
-    renderGame();
+    pendingVisualEvent = result.visual_event || null;
+    if (state.status !== 'active' && state.campaign_id) {
+      campaigns = await api('/api/v1/campaigns');
+    }
     dialogLabel.textContent = state.status === 'won' ? 'MISSION COMPLETE' : state.status === 'lost' ? 'MISSION ENDED' : 'STOCHASTIC OUTCOME';
-    dialogTitle.textContent = result.progress_change > 12 ? 'Major movement' : result.progress_change > 0 ? 'The case moved' : 'No clear progress';
+    dialogTitle.textContent = state.status === 'won' ? 'Thresholds secured' : state.status === 'lost' ? 'Campaign ended' : 'Civic progress by factor';
     dialogMessage.textContent = result.message;
-    dialogDelta.textContent = `${result.progress_change >= 0 ? '+' : ''}${result.progress_change}% mission progress`;
+    const factorChanges = factorChangeLines(result.value_changes, state, true);
+    dialogDelta.textContent = factorChanges.length
+      ? factorChanges.join(' · ')
+      : 'No visible civic factor changed in this outcome.';
     if (typeof resultDialog.showModal === 'function') resultDialog.showModal();
   } catch (error) {
     alert(error.message);
@@ -288,6 +580,14 @@ async function restoreSession() {
   if (!sessionId) return false;
   try {
     state = await api(`/api/v1/sessions/${encodeURIComponent(sessionId)}`);
+    if (state.campaign_id) {
+      activeCampaignId = state.campaign_id;
+      storageSet(campaignStorageKey, activeCampaignId);
+    }
+    if (!scenario || scenario.id !== state.game_pack_id) {
+      scenario = await api(`/api/v1/scenarios/${encodeURIComponent(state.game_pack_id)}`);
+      applyScenarioTheme();
+    }
     renderGame();
     return true;
   } catch {
@@ -299,14 +599,21 @@ async function restoreSession() {
 async function boot() {
   app.innerHTML = '<section class="loading-panel"><div class="spinner" aria-hidden="true"></div><p>Loading the civic simulation…</p></section>';
   try {
-    const [health, loadedScenario] = await Promise.all([
+    const [health, loadedScenarios, loadedGenerator, loadedCampaigns] = await Promise.all([
       api('/api/v1/health'),
-      api('/api/v1/scenario'),
+      api('/api/v1/scenarios'),
+      api('/api/v1/scenario-generator'),
+      api('/api/v1/campaigns'),
     ]);
-    scenario = loadedScenario;
+    scenarios = loadedScenarios;
+    generatorCatalog = loadedGenerator;
+    campaigns = loadedCampaigns;
+    campaignsSupported = health.campaigns_supported !== false;
+    const storedCampaign = storageGet(campaignStorageKey);
+    activeCampaignId = campaigns.some((item) => item.id === storedCampaign) ? storedCampaign : null;
     setConnection(true, `${health.sessions} saved session${health.sessions === 1 ? '' : 's'}`);
     const restored = await restoreSession();
-    if (!restored) renderProfileSelection();
+    if (!restored) renderScenarioSelection();
   } catch (error) {
     setConnection(false);
     renderError(error.message);
@@ -317,7 +624,7 @@ newGameButton.addEventListener('click', () => {
   if (!confirm('Start a new game? The current session remains saved on the server.')) return;
   state = null;
   storageRemove(sessionStorageKey);
-  renderProfileSelection();
+  renderScenarioSelection();
 });
 
 dialogClose.addEventListener('click', () => resultDialog.close());

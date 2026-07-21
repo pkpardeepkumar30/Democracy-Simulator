@@ -1,0 +1,382 @@
+{
+  "schema_version": 2,
+  "id": "examination-scandal-v1",
+  "title": "The Examination Scandal",
+  "description": "Organize a lawful national accountability campaign after evidence shows that a public examination was leaked.",
+  "version": "1.1.0",
+  "campaign": {
+    "imports": [
+      { "source_id": "civic_reputation", "target_id": "community_support", "multiplier": 0.25, "min": -15, "max": 15 },
+      { "source_id": "institutional_knowledge", "target_id": "documentation", "multiplier": 0.2, "min": -12, "max": 12 },
+      { "source_id": "civic_network", "target_id": "influence", "multiplier": 0.2, "min": -10, "max": 12 }
+    ],
+    "exports": [
+      { "source_id": "integrity", "target_id": "civic_reputation", "multiplier": 0.15, "source_offset": 50, "min": -8, "max": 8 },
+      { "source_id": "documentation", "target_id": "institutional_knowledge", "multiplier": 0.1, "source_offset": 40, "min": -5, "max": 6 },
+      { "source_id": "community_support", "target_id": "civic_network", "multiplier": 0.1, "source_offset": 40, "min": -5, "max": 6 }
+    ],
+    "won_effect": { "civic_reputation": 9, "institutional_knowledge": 6, "civic_network": 7 },
+    "lost_effect": { "civic_reputation": -4, "civic_network": -3 }
+  },
+  "environment": {
+    "world_region": "Federal metropolitan region",
+    "government_level": "Federal/national",
+    "political_system": "Federal democracy",
+    "administrative_capacity": "Fragmented across agencies",
+    "corruption_structure": "Political patronage",
+    "rule_of_law": "Slow but independent",
+    "media_environment": "Polarized",
+    "civil_society_strength": "Student-led activism",
+    "economic_condition": "High unemployment",
+    "inequality_level": "Regional inequality",
+    "modifiers": ["Government has a one-seat majority", "Media is polarized", "Social media is highly influential"]
+  },
+  "mission": {
+    "title": "Force accountability after the examination leak",
+    "objective": "Build verified evidence and a broad lawful coalition to secure ministerial accountability and a fair remedy for candidates.",
+    "starting_status": "Rumors of a leaked paper are spreading, but the ministry denies that the examination was compromised.",
+    "win_progress": 100,
+    "objective_type": "Pressure or remove an official",
+    "time_horizon": "120 days before the next academic cycle"
+  },
+  "value_definitions": [
+    { "id": "money", "label": "Campaign funds", "group": "resource", "min": -5000, "max": 50000, "format": "money" },
+    { "id": "energy", "label": "Organizer energy", "group": "resource", "min": 0, "max": 100, "format": "percent" },
+    { "id": "influence", "label": "Political access", "group": "resource", "min": 0, "max": 100, "format": "percent" },
+    { "id": "days_remaining", "label": "Days to academic deadline", "group": "resource", "min": 0, "max": 120, "format": "days" },
+    { "id": "progress", "label": "Legacy progress", "group": "metric", "min": 0, "max": 100, "format": "percent", "hidden_from_hud": true },
+    { "id": "documentation", "label": "Evidence strength", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "community_support", "label": "Public support", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "public_attention", "label": "Media pressure", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "integrity", "label": "Campaign legitimacy", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "institutional_pressure", "label": "Institutional pressure", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "movement_unity", "label": "Movement unity", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "government_resistance", "label": "Government resistance", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "evidence_stage", "label": "Verification stage", "description": "0 unverified; 1 independently verified; 2 corroborated; 3 chain-of-custody confirmed; 4 legally admissible.", "group": "metric", "min": 0, "max": 4, "format": "number" },
+    { "id": "whistleblower_packet_available", "label": "Whistleblower packet available", "group": "metric", "min": 0, "max": 1, "format": "number", "hidden_from_hud": true },
+    { "id": "whistleblower_packet_verified", "label": "Whistleblower packet verified", "group": "metric", "min": 0, "max": 1, "format": "number", "hidden_from_hud": true },
+    { "id": "exam_remedy", "label": "Fair-exam remedy", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "crackdown", "label": "Crackdown risk", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "government_stability", "label": "Government stability", "group": "metric", "min": 0, "max": 100, "format": "percent", "hidden_from_hud": true },
+    { "id": "disinformation_resilience", "label": "Disinformation resilience", "group": "metric", "min": 0, "max": 100, "format": "percent" }
+  ],
+  "hidden_variable_definitions": [
+    { "id": "minister_support", "min": 30, "max": 90 },
+    { "id": "coalition_cohesion", "min": 25, "max": 85 },
+    { "id": "police_tolerance", "min": 20, "max": 85 },
+    { "id": "leak_credibility", "min": 45, "max": 95 },
+    { "id": "election_proximity", "min": 15, "max": 90 }
+  ],
+  "institutions": [
+    { "id": "education_ministry", "name": "Federal Education Ministry", "institution_type": "Ministry", "description": "Runs the examination authority and answers to parliament." },
+    { "id": "parliament", "name": "Federal Assembly", "institution_type": "Parliament", "description": "Can question the minister and establish an inquiry." },
+    { "id": "high_court", "name": "Federal High Court", "institution_type": "Court", "description": "Can protect candidates and order an independent review." },
+    { "id": "election_commission", "name": "Election Commission", "institution_type": "Election commission", "description": "Monitors campaign-period conduct and public resources." },
+    { "id": "capital_police", "name": "Capital Police", "institution_type": "Police department", "description": "Regulates demonstrations around national institutions." },
+    { "id": "national_media", "name": "National Press Forum", "institution_type": "Media", "description": "A polarized collection of broadcasters and investigative reporters." }
+  ],
+  "stakeholders": [
+    { "id": "minister", "name": "Minister Leona Varek", "archetype": "Political appointee", "institution_id": "education_ministry", "interests": ["remaining in office", "controlling the inquiry"], "fears": ["verified leak trail", "coalition defection"], "public_description": "The minister denies institutional responsibility." },
+    { "id": "head_of_government", "name": "Prime Minister Oren Dast", "archetype": "Government politician", "institution_id": "parliament", "interests": ["coalition survival", "public confidence"], "fears": ["government collapse"], "public_description": "The prime minister will act only when keeping the minister becomes more costly." },
+    { "id": "opposition", "name": "Democratic Reform Bloc", "archetype": "Opposition politician", "institution_id": "parliament", "interests": ["public inquiry", "electoral advantage"], "fears": ["appearing opportunistic"], "public_description": "The opposition can amplify evidence but may polarize the campaign." },
+    { "id": "student_unions", "name": "National Candidate Coalition", "archetype": "Activist network", "interests": ["fair examination", "candidate protection"], "fears": ["fragmentation", "arrests"], "public_description": "Regional student groups disagree about tactics but share the demand for fairness." },
+    { "id": "teachers", "name": "Teachers Federation", "archetype": "Union leader", "interests": ["credible examinations", "institutional reform"], "fears": ["political retaliation"], "public_description": "Teachers add professional credibility when evidence is strong." },
+    { "id": "journalists", "name": "Independent Examination Desk", "archetype": "Journalist", "institution_id": "national_media", "interests": ["verified investigation"], "fears": ["defamation suits", "fabricated evidence"], "public_description": "Investigative reporters require verifiable documents and protected sources." },
+    { "id": "police", "name": "Public Order Commissioner", "archetype": "Police officer", "institution_id": "capital_police", "interests": ["order", "clear permissions"], "fears": ["violence", "political blame"], "public_description": "Police tolerance depends on legality, crowd discipline and political pressure." }
+  ],
+  "barriers": [
+    { "id": "unverified_leak", "title": "Unverified leaked files", "barrier_type": "Evidence is challenged", "description": "A false or altered document could destroy the campaign's credibility." },
+    { "id": "regional_divisions", "title": "Regional student divisions", "barrier_type": "Jurisdiction dispute", "description": "Candidate groups disagree about remedies and tactics." },
+    { "id": "assembly_permission", "title": "Assembly permission", "barrier_type": "Security clearance", "description": "Large demonstrations require notice, stewards and a safe route." },
+    { "id": "polarized_media", "title": "Polarized media", "barrier_type": "Policy change", "description": "Partisan coverage can turn a fairness campaign into party conflict." }
+  ],
+  "random_events": [
+    {
+      "id": "whistleblower_packet",
+      "title": "Whistleblower packet arrives",
+      "message": "An anonymous examination official provides verifiable server logs and custody records.",
+      "chance_per_turn": 0.09,
+      "once": true,
+      "conditions": [{ "metric": "documentation", "min": 20 }],
+      "effect": { "public_attention": 4, "values": { "whistleblower_packet_available": 1 } },
+      "visual_event": { "focus_location_id": "media", "animation": "document-leak", "effect": "evidence" }
+    },
+    {
+      "id": "police_restrictions",
+      "title": "Police impose assembly restrictions",
+      "message": "Police narrow the approved march route and cap attendance, raising tension inside the coalition.",
+      "chance_per_turn": 0.08,
+      "once": true,
+      "conditions": [{ "metric": "community_support", "min": 40 }, { "metric": "police_tolerance", "max": 45 }],
+      "effect": { "community_support": -7, "values": { "crackdown": 18 }, "resources": { "energy": -4 } },
+      "visual_event": { "focus_location_id": "police", "animation": "restrictions", "effect": "danger" }
+    },
+    {
+      "id": "coalition_partner_defects",
+      "title": "Coalition partner defects",
+      "message": "A governing-party faction demands an independent inquiry, sharply weakening the minister.",
+      "chance_per_turn": 0.07,
+      "once": true,
+      "conditions": [{ "metric": "institutional_pressure", "min": 55 }, { "metric": "election_proximity", "min": 55 }],
+      "effect": { "values": { "government_stability": -25, "government_resistance": -18 } },
+      "visual_event": { "focus_location_id": "parliament", "animation": "coalition-defection", "effect": "breakthrough" }
+    },
+    {
+      "id": "counter_campaign",
+      "title": "Counter-campaign begins",
+      "message": "Anonymous accounts accuse organizers of fabricating the leak and serving party interests.",
+      "chance_per_turn": 0.1,
+      "once": true,
+      "conditions": [{ "metric": "public_attention", "min": 30 }, { "metric": "disinformation_resilience", "max": 45 }],
+      "effect": { "community_support": -10, "integrity": -6, "public_attention": 5 },
+      "visual_event": { "focus_location_id": "media", "animation": "disinformation-wave", "effect": "setback" }
+    }
+  ],
+  "endings": [
+    { "id": "minister_resigns", "title": "Minister resigns", "message": "The minister resigns and parliament establishes an independent examination-reform commission.", "status": "won", "conditions": [{ "metric": "documentation", "min": 75 }, { "metric": "community_support", "min": 50 }, { "metric": "public_attention", "min": 45 }, { "metric": "institutional_pressure", "min": 65 }, { "metric": "movement_unity", "min": 45 }, { "metric": "government_resistance", "max": 40 }, { "metric": "integrity", "min": 35 }] },
+    { "id": "binding_inquiry", "title": "Independent inquiry", "message": "Parliament compels an independent inquiry with public reporting and candidate representation.", "status": "won", "conditions": [{ "metric": "evidence_stage", "min": 4 }, { "metric": "documentation", "min": 70 }, { "metric": "community_support", "min": 35 }, { "metric": "institutional_pressure", "min": 50 }] },
+    { "id": "fair_exam_remedy", "title": "Examination repeated", "message": "The examination is cancelled and repeated under independent supervision with candidate protections.", "status": "won", "conditions": [{ "metric": "exam_remedy", "min": 75 }, { "metric": "documentation", "min": 70 }, { "metric": "institutional_pressure", "min": 50 }] },
+    { "id": "crackdown", "title": "Campaign crackdown", "message": "Escalating confrontation produces mass restrictions and the organized campaign can no longer operate.", "status": "lost", "conditions": [{ "metric": "crackdown", "min": 100 }] },
+    { "id": "movement_collapses", "title": "Movement collapses", "message": "Regional groups leave the coalition and the accountability campaign collapses.", "status": "lost", "conditions": [{ "metric": "community_support", "max": 0 }] },
+    { "id": "government_instability", "title": "Government instability", "message": "The coalition falls amid confrontation before a credible examination remedy is secured.", "status": "lost", "conditions": [{ "metric": "government_stability", "max": 0 }, { "metric": "exam_remedy", "max": 60 }] },
+    { "id": "deadline_expired", "title": "Academic deadline expires", "message": "The next academic cycle begins without accountability or a fair remedy.", "status": "lost", "conditions": [{ "metric": "days_remaining", "max": 0 }] },
+    { "id": "organizer_exhaustion", "title": "Organizer exhaustion", "message": "The campaign's organizers are too exhausted to continue coordinating nationally.", "status": "lost", "conditions": [{ "metric": "energy", "max": 0 }] }
+  ],
+  "visual_theme": {
+    "id": "federal_capital_campaign",
+    "layout": "civic_city_map",
+    "primary_color": "#312e5f",
+    "accent_color": "#d94f70",
+    "background_color": "#f1eef8",
+    "locations": [
+      { "id": "campus", "label": "National University", "x": 18, "y": 68 },
+      { "id": "ministry", "label": "Education Ministry", "institution_id": "education_ministry", "x": 62, "y": 36 },
+      { "id": "parliament", "label": "Federal Assembly", "institution_id": "parliament", "x": 78, "y": 28 },
+      { "id": "court", "label": "High Court", "institution_id": "high_court", "x": 82, "y": 62 },
+      { "id": "police", "label": "Public Order Office", "institution_id": "capital_police", "x": 48, "y": 70 },
+      { "id": "media", "label": "National Press Forum", "institution_id": "national_media", "x": 38, "y": 24 }
+    ]
+  },
+  "citizens": [
+    {
+      "id": "exam_candidate",
+      "name": "Mira Talen",
+      "occupation": "Examination candidate",
+      "role": "Student",
+      "context": "Mira has first-hand credibility and many candidate contacts, but limited money and political access.",
+      "starting_resources": { "money": 14000, "energy": 100, "influence": 7, "days_remaining": 120 },
+      "starting_metrics": { "progress": 0, "documentation": 12, "community_support": 24, "public_attention": 5, "integrity": 100 },
+      "starting_values": { "exam_remedy": 0, "crackdown": 0, "government_stability": 70, "disinformation_resilience": 20, "institutional_pressure": 0, "movement_unity": 24, "government_resistance": 78, "evidence_stage": 0, "whistleblower_packet_available": 0, "whistleblower_packet_verified": 0 },
+      "skills": { "digital_campaigning": 65, "legal_knowledge": 25 },
+      "relationships": { "student_unions": 45, "journalists": 20 },
+      "modifiers": { "action:Organize residents": 1.12 },
+      "visual": { "start_location_id": "campus" }
+    },
+    {
+      "id": "union_organizer",
+      "name": "Adil Koren",
+      "occupation": "Student-union organizer",
+      "role": "Community organizer",
+      "context": "Adil can mobilize regional unions quickly, but is already portrayed as partisan by hostile media.",
+      "starting_resources": { "money": 14000, "energy": 100, "influence": 14, "days_remaining": 120 },
+      "starting_metrics": { "progress": 0, "documentation": 8, "community_support": 38, "public_attention": 12, "integrity": 88 },
+      "starting_values": { "exam_remedy": 0, "crackdown": 8, "government_stability": 70, "disinformation_resilience": 28, "institutional_pressure": 4, "movement_unity": 38, "government_resistance": 78, "evidence_stage": 0, "whistleblower_packet_available": 0, "whistleblower_packet_verified": 0 },
+      "skills": { "digital_campaigning": 55, "coalition_building": 72 },
+      "relationships": { "student_unions": 70, "journalists": 30 },
+      "modifiers": { "action:Organize protest": 1.1 },
+      "visual": { "start_location_id": "campus" }
+    },
+    {
+      "id": "law_student",
+      "name": "Sana Belik",
+      "occupation": "Final-year law student",
+      "role": "Student",
+      "context": "Sana can verify procedure and frame a strong court case, but has a smaller organizing network.",
+      "starting_resources": { "money": 17000, "energy": 100, "influence": 10, "days_remaining": 120 },
+      "starting_metrics": { "progress": 0, "documentation": 24, "community_support": 14, "public_attention": 3, "integrity": 100 },
+      "starting_values": { "exam_remedy": 0, "crackdown": 0, "government_stability": 70, "disinformation_resilience": 32, "institutional_pressure": 2, "movement_unity": 14, "government_resistance": 78, "evidence_stage": 0, "whistleblower_packet_available": 0, "whistleblower_packet_verified": 0 },
+      "skills": { "legal_knowledge": 75, "evidence_verification": 68 },
+      "relationships": { "student_unions": 25, "journalists": 24 },
+      "modifiers": { "action:File court case": 1.12 },
+      "visual": { "start_location_id": "campus" }
+    }
+  ],
+  "actions": [
+    {
+      "id": "verify_leak",
+      "title": "Verify the leaked examination files",
+      "description": "Build a chain of custody, compare paper versions and protect the original sources.",
+      "action_type": "Submit evidence",
+      "location_id": "campus",
+      "cost": { "money": 600, "energy": 6, "influence": 0, "days": 6 },
+      "guaranteed_effect": { "documentation": 12, "values": { "disinformation_resilience": 5, "evidence_stage": 1 } },
+      "requirements": [{ "metric": "evidence_stage", "max": 0, "message": "The original leak has already moved beyond the unverified stage." }],
+      "outcomes": [
+        { "id": "verified_match", "message": "Independent experts verify that the leaked paper matches the examination.", "base_weight": 44, "progress_min": 9, "progress_max": 15, "effect": { "documentation": 10, "public_attention": 5 }, "conditions": [{ "metric": "leak_credibility", "min": 65, "multiplier": 1.5 }], "visual_event": { "focus_location_id": "campus", "animation": "evidence-verified", "effect": "evidence" } },
+        { "id": "partial_chain", "message": "The files appear genuine, but gaps in custody limit what reporters can safely claim.", "base_weight": 38, "progress_min": 3, "progress_max": 8, "effect": { "documentation": 5 }, "conditions": [], "visual_event": { "focus_location_id": "campus", "animation": "document-review", "effect": "neutral" } },
+        { "id": "source_withdraws", "message": "A frightened source withdraws and several claims must be removed.", "base_weight": 18, "progress_min": 0, "progress_max": 3, "effect": { "documentation": -4, "resources": { "energy": -3 } }, "conditions": [{ "metric": "minister_support", "min": 70, "multiplier": 1.4 }], "visual_event": { "focus_location_id": "campus", "animation": "source-withdraws", "effect": "setback" } }
+      ]
+    },
+    {
+      "id": "corroborate_leak",
+      "title": "Corroborate the independently verified leak",
+      "description": "Match the verified paper against candidate copies, printing records and testimony from separate sources.",
+      "action_type": "Submit evidence",
+      "location_id": "campus",
+      "cost": { "money": 900, "energy": 7, "influence": 0, "days": 7 },
+      "guaranteed_effect": { "documentation": 14, "values": { "evidence_stage": 1 } },
+      "requirements": [{ "metric": "evidence_stage", "min": 1, "max": 1, "message": "Independent verification must exist before corroboration." }],
+      "outcomes": [
+        { "id": "independent_sources_match", "message": "Independent candidate copies and printing records corroborate the verified leak.", "base_weight": 70, "progress_min": 0, "progress_max": 0, "effect": { "documentation": 8, "community_support": 4 }, "conditions": [], "visual_event": { "focus_location_id": "campus", "animation": "sources-corroborated", "effect": "evidence" } },
+        { "id": "partial_corroboration", "message": "The separate sources corroborate the core allegation while leaving some details unresolved.", "base_weight": 30, "progress_min": 0, "progress_max": 0, "effect": { "documentation": 3 }, "conditions": [], "visual_event": { "focus_location_id": "campus", "animation": "partial-corroboration", "effect": "neutral" } }
+      ]
+    },
+    {
+      "id": "confirm_chain_of_custody",
+      "title": "Confirm the evidence chain of custody",
+      "description": "Document who obtained, stored, copied and examined each item without relying on the allegation alone.",
+      "action_type": "Submit evidence",
+      "location_id": "campus",
+      "cost": { "money": 1200, "energy": 8, "influence": 0, "days": 8 },
+      "guaranteed_effect": { "documentation": 16, "values": { "evidence_stage": 1 } },
+      "requirements": [{ "metric": "evidence_stage", "min": 2, "max": 2, "message": "Corroborated evidence is required before confirming custody." }],
+      "outcomes": [
+        { "id": "custody_confirmed", "message": "A protected evidence log confirms an unbroken chain of custody.", "base_weight": 72, "progress_min": 0, "progress_max": 0, "effect": { "documentation": 7, "integrity": 3 }, "conditions": [], "visual_event": { "focus_location_id": "campus", "animation": "custody-confirmed", "effect": "evidence" } },
+        { "id": "custody_gap_repaired", "message": "Investigators repair a custody gap through signed testimony and archived hashes.", "base_weight": 28, "progress_min": 0, "progress_max": 0, "effect": { "documentation": 3, "resources": { "energy": -2 } }, "conditions": [], "visual_event": { "focus_location_id": "campus", "animation": "custody-repaired", "effect": "neutral" } }
+      ]
+    },
+    {
+      "id": "prepare_admissible_record",
+      "title": "Prepare a legally admissible evidence record",
+      "description": "Have counsel authenticate the chain, redact protected identities and prepare sworn exhibits.",
+      "action_type": "Submit evidence",
+      "location_id": "court",
+      "cost": { "money": 1800, "energy": 8, "influence": 1, "days": 9 },
+      "guaranteed_effect": { "documentation": 18, "integrity": 3, "values": { "evidence_stage": 1, "institutional_pressure": 8 } },
+      "requirements": [{ "metric": "evidence_stage", "min": 3, "max": 3, "message": "A confirmed chain of custody is required before legal admission." }],
+      "outcomes": [
+        { "id": "record_admissible", "message": "Counsel certifies the record as suitable for court and parliamentary proceedings.", "base_weight": 78, "progress_min": 0, "progress_max": 0, "effect": { "documentation": 8, "values": { "institutional_pressure": 6 } }, "conditions": [], "visual_event": { "focus_location_id": "court", "animation": "record-admissible", "effect": "evidence" } },
+        { "id": "limited_admission", "message": "Most exhibits are admissible, although one source must remain confidential.", "base_weight": 22, "progress_min": 0, "progress_max": 0, "effect": { "documentation": 4 }, "conditions": [], "visual_event": { "focus_location_id": "court", "animation": "limited-admission", "effect": "neutral" } }
+      ]
+    },
+    {
+      "id": "verify_whistleblower_evidence",
+      "title": "Verify whistleblower evidence",
+      "description": "Authenticate the newly arrived server logs and custody records before using them publicly.",
+      "action_type": "Submit evidence",
+      "location_id": "media",
+      "cost": { "money": 1000, "energy": 7, "influence": 0, "days": 6 },
+      "guaranteed_effect": { "documentation": 16, "values": { "whistleblower_packet_verified": 1, "institutional_pressure": 10, "government_resistance": -8, "disinformation_resilience": 10 } },
+      "requirements": [{ "metric": "whistleblower_packet_available", "min": 1, "message": "No whistleblower packet has arrived." }, { "metric": "whistleblower_packet_verified", "max": 0, "message": "The whistleblower packet has already been verified." }],
+      "outcomes": [
+        { "id": "packet_authenticated", "message": "Independent specialists authenticate the packet and link it to the examination system.", "base_weight": 75, "progress_min": 0, "progress_max": 0, "effect": { "documentation": 10, "public_attention": 7 }, "conditions": [], "visual_event": { "focus_location_id": "media", "animation": "packet-authenticated", "effect": "breakthrough" } },
+        { "id": "packet_partially_authenticated", "message": "The core logs are authentic, but protected portions cannot yet be published.", "base_weight": 25, "progress_min": 0, "progress_max": 0, "effect": { "documentation": 5 }, "conditions": [], "visual_event": { "focus_location_id": "media", "animation": "packet-reviewed", "effect": "evidence" } }
+      ]
+    },
+    {
+      "id": "build_student_coalition",
+      "title": "Build a national student coalition",
+      "description": "Agree on lawful tactics and a shared remedy across regional candidate groups.",
+      "action_type": "Build coalition",
+      "location_id": "campus",
+      "cost": { "money": 900, "energy": 9, "influence": 0, "days": 7 },
+      "guaranteed_effect": { "community_support": 15, "integrity": 2, "values": { "movement_unity": 20 } },
+      "requirements": [],
+      "outcomes": [
+        { "id": "common_charter", "message": "Regional unions sign a common charter for an inquiry and protected re-examination.", "base_weight": 45, "progress_min": 8, "progress_max": 14, "effect": { "community_support": 10, "values": { "exam_remedy": 8 } }, "conditions": [{ "metric": "coalition_cohesion", "min": 55, "multiplier": 1.45 }], "visual_event": { "focus_location_id": "campus", "animation": "coalition-forms", "effect": "support" } },
+        { "id": "uneasy_alliance", "message": "Groups coordinate a first statement but postpone disagreement about protest tactics.", "base_weight": 38, "progress_min": 3, "progress_max": 8, "effect": { "community_support": 4 }, "conditions": [], "visual_event": { "focus_location_id": "campus", "animation": "meeting", "effect": "neutral" } },
+        { "id": "regional_split", "message": "A regional union leaves after its remedy is excluded from the platform.", "base_weight": 17, "progress_min": 0, "progress_max": 2, "effect": { "community_support": -9, "integrity": -3 }, "conditions": [{ "metric": "coalition_cohesion", "max": 40, "multiplier": 1.7 }], "visual_event": { "focus_location_id": "campus", "animation": "coalition-split", "effect": "setback" } }
+      ]
+    },
+    {
+      "id": "petition_ministry",
+      "title": "Demand a ministry inquiry",
+      "description": "Submit verified evidence and a candidate charter through the ministry's formal accountability channel.",
+      "action_type": "File application",
+      "location_id": "ministry",
+      "cost": { "money": 500, "energy": 5, "influence": 0, "days": 8 },
+      "guaranteed_effect": { "documentation": 5, "values": { "institutional_pressure": 14, "government_resistance": -5 } },
+      "requirements": [{ "metric": "evidence_stage", "min": 1, "message": "Independent verification is required before petitioning the ministry." }],
+      "outcomes": [
+        { "id": "internal_review", "message": "The ministry opens a time-bound internal review and must preserve examination records.", "base_weight": 34, "progress_min": 10, "progress_max": 18, "effect": { "values": { "exam_remedy": 10 } }, "conditions": [{ "metric": "documentation", "min": 50, "multiplier": 1.5 }], "visual_event": { "focus_location_id": "ministry", "animation": "inquiry-opens", "effect": "progress" } },
+        { "id": "denial_repeated", "message": "The ministry repeats its denial but the written reply creates an appealable record.", "base_weight": 46, "progress_min": 4, "progress_max": 9, "effect": { "documentation": 5 }, "conditions": [], "visual_event": { "focus_location_id": "ministry", "animation": "official-denial", "effect": "neutral" } },
+        { "id": "organizers_named", "message": "The ministry publicly names organizers and alleges political motives.", "base_weight": 20, "progress_min": 1, "progress_max": 5, "effect": { "integrity": -5, "values": { "crackdown": 7 } }, "conditions": [{ "metric": "minister_support", "min": 65, "multiplier": 1.5 }], "visual_event": { "focus_location_id": "ministry", "animation": "retaliation", "effect": "danger" } }
+      ]
+    },
+    {
+      "id": "brief_investigative_media",
+      "title": "Brief investigative journalists",
+      "description": "Give reporters the verified timeline, source protections and candidate testimony.",
+      "action_type": "Contact media",
+      "location_id": "media",
+      "cost": { "money": 1200, "energy": 8, "influence": 2, "days": 5 },
+      "guaranteed_effect": { "public_attention": 18, "values": { "institutional_pressure": 8, "government_resistance": -4 } },
+      "requirements": [{ "metric": "evidence_stage", "min": 2, "message": "Journalists need corroborated evidence." }, { "metric": "community_support", "min": 25, "message": "The story needs representative candidate voices." }],
+      "outcomes": [
+        { "id": "national_investigation", "message": "Multiple outlets publish a corroborated investigation and demand answers from parliament.", "base_weight": 40, "progress_min": 15, "progress_max": 24, "effect": { "public_attention": 12, "values": { "government_stability": -8 } }, "conditions": [{ "metric": "documentation", "min": 60, "multiplier": 1.5 }, { "metric": "disinformation_resilience", "min": 45, "multiplier": 1.2 }], "visual_event": { "focus_location_id": "media", "animation": "headline-wave", "effect": "breakthrough" } },
+        { "id": "polarized_coverage", "message": "The investigation airs, but partisan panels turn much of the debate into accusation and counter-accusation.", "base_weight": 42, "progress_min": 6, "progress_max": 12, "effect": { "public_attention": 9, "community_support": -2 }, "conditions": [], "visual_event": { "focus_location_id": "media", "animation": "polarized-debate", "effect": "attention" } },
+        { "id": "fabrication_claim", "message": "A broadcaster circulates a misleading analysis that damages trust in the documents.", "base_weight": 18, "progress_min": 0, "progress_max": 4, "effect": { "integrity": -8, "community_support": -6 }, "conditions": [{ "metric": "disinformation_resilience", "max": 35, "multiplier": 1.7 }], "visual_event": { "focus_location_id": "media", "animation": "false-narrative", "effect": "setback" } }
+      ]
+    },
+    {
+      "id": "lawful_demonstration",
+      "title": "Organize a lawful national demonstration",
+      "description": "Coordinate permissions, trained stewards, a clear message and synchronized regional events.",
+      "action_type": "Organize protest",
+      "location_id": "parliament",
+      "cost": { "money": 2200, "energy": 13, "influence": 2, "days": 8 },
+      "guaranteed_effect": { "public_attention": 15, "community_support": 5, "values": { "institutional_pressure": 15, "movement_unity": 10, "government_resistance": -7 } },
+      "requirements": [{ "metric": "community_support", "min": 40, "message": "A national demonstration needs broader public support." }, { "metric": "movement_unity", "min": 40, "message": "The movement must agree on lawful tactics first." }, { "metric": "integrity", "min": 45, "message": "Restore campaign legitimacy before risking a mass demonstration." }],
+      "outcomes": [
+        { "id": "peaceful_mass_turnout", "message": "A disciplined mass turnout wins broad sympathy and forces an emergency parliamentary debate.", "base_weight": 38, "progress_min": 18, "progress_max": 28, "effect": { "community_support": 8, "values": { "government_stability": -10, "exam_remedy": 8 } }, "conditions": [{ "metric": "community_support", "min": 65, "multiplier": 1.45 }, { "metric": "police_tolerance", "min": 50, "multiplier": 1.25 }], "visual_event": { "focus_location_id": "parliament", "animation": "peaceful-march", "effect": "breakthrough" } },
+        { "id": "restricted_but_visible", "message": "Police restrict the route, but organizers remain peaceful and the demand stays visible.", "base_weight": 40, "progress_min": 7, "progress_max": 14, "effect": { "values": { "crackdown": 8 }, "resources": { "energy": -3 } }, "conditions": [], "visual_event": { "focus_location_id": "police", "animation": "restricted-march", "effect": "attention" } },
+        { "id": "clashes", "message": "A small group clashes with police, overwhelming the campaign's message and triggering arrests.", "base_weight": 22, "progress_min": 0, "progress_max": 5, "effect": { "community_support": -12, "integrity": -10, "values": { "crackdown": 28 } }, "conditions": [{ "metric": "police_tolerance", "max": 40, "multiplier": 1.7 }], "visual_event": { "focus_location_id": "police", "animation": "protest-clash", "effect": "danger" } }
+      ]
+    },
+    {
+      "id": "court_petition",
+      "title": "File a candidate-protection petition",
+      "description": "Ask the high court to preserve records, supervise an inquiry and protect candidates from an invalid result.",
+      "action_type": "File court case",
+      "location_id": "court",
+      "cost": { "money": 4500, "energy": 11, "influence": 0, "days": 18 },
+      "guaranteed_effect": { "documentation": 8, "integrity": 3, "values": { "institutional_pressure": 24, "government_resistance": -14 } },
+      "requirements": [{ "metric": "evidence_stage", "min": 4, "message": "The petition needs a legally admissible evidence record." }, { "metric": "institutional_pressure", "min": 15, "message": "Use at least one formal accountability route before filing." }],
+      "outcomes": [
+        { "id": "independent_audit_ordered", "message": "The court orders an independent digital audit and protects candidates from irreversible appointments.", "base_weight": 42, "progress_min": 18, "progress_max": 30, "effect": { "values": { "exam_remedy": 28 } }, "conditions": [{ "metric": "documentation", "min": 70, "multiplier": 1.55 }], "visual_event": { "focus_location_id": "court", "animation": "court-order", "effect": "breakthrough" } },
+        { "id": "notice_issued", "message": "The court issues notice to the ministry but schedules a later hearing.", "base_weight": 42, "progress_min": 8, "progress_max": 15, "effect": { "public_attention": 6, "resources": { "days_remaining": -7 } }, "conditions": [], "visual_event": { "focus_location_id": "court", "animation": "notice-issued", "effect": "progress" } },
+        { "id": "standing_challenged", "message": "Government lawyers challenge standing and delay the merits hearing.", "base_weight": 16, "progress_min": 0, "progress_max": 5, "effect": { "resources": { "money": -1800, "energy": -4, "days_remaining": -10 } }, "conditions": [{ "metric": "documentation", "max": 59, "multiplier": 1.5 }], "visual_event": { "focus_location_id": "court", "animation": "legal-delay", "effect": "setback" } }
+      ]
+    },
+    {
+      "id": "parliamentary_outreach",
+      "title": "Build cross-party parliamentary pressure",
+      "description": "Brief committee members from government and opposition on evidence and candidate remedies.",
+      "action_type": "Contact elected representative",
+      "location_id": "parliament",
+      "cost": { "money": 1000, "energy": 7, "influence": 8, "days": 6 },
+      "guaranteed_effect": { "public_attention": 6, "values": { "institutional_pressure": 20, "government_resistance": -12 } },
+      "requirements": [{ "metric": "public_attention", "min": 30, "message": "Legislators will not prioritize a low-visibility case." }, { "metric": "documentation", "min": 40, "message": "Cross-party outreach needs a credible evidence brief." }],
+      "outcomes": [
+        { "id": "committee_inquiry", "message": "A cross-party committee summons ministry officials and examination contractors.", "base_weight": 38, "progress_min": 17, "progress_max": 27, "effect": { "values": { "government_stability": -12, "exam_remedy": 12 } }, "conditions": [{ "metric": "election_proximity", "min": 55, "multiplier": 1.5 }, { "metric": "community_support", "min": 55, "multiplier": 1.25 }], "visual_event": { "focus_location_id": "parliament", "animation": "committee-hearing", "effect": "breakthrough" } },
+        { "id": "opposition_motion", "message": "The opposition files a motion, increasing pressure but allowing the government to frame the issue as partisan.", "base_weight": 44, "progress_min": 8, "progress_max": 15, "effect": { "public_attention": 7, "integrity": -2 }, "conditions": [], "visual_event": { "focus_location_id": "parliament", "animation": "floor-motion", "effect": "attention" } },
+        { "id": "access_blocked", "message": "Party whips prevent governing members from meeting the candidate delegation.", "base_weight": 18, "progress_min": 1, "progress_max": 5, "effect": { "resources": { "influence": -3, "energy": -3 } }, "conditions": [{ "metric": "minister_support", "min": 70, "multiplier": 1.6 }], "visual_event": { "focus_location_id": "parliament", "animation": "doors-close", "effect": "setback" } }
+      ]
+    },
+    {
+      "id": "counter_disinformation",
+      "title": "Run a verified-information campaign",
+      "description": "Publish source notes, corrections, regional-language explainers and a public evidence index.",
+      "action_type": "Use digital campaign",
+      "location_id": "media",
+      "cost": { "money": 1300, "energy": 8, "influence": 0, "days": 5 },
+      "guaranteed_effect": { "values": { "disinformation_resilience": 18, "movement_unity": 10 }, "documentation": 4, "integrity": 3 },
+      "requirements": [{ "metric": "documentation", "min": 30, "message": "A verified-information campaign needs a solid public evidence base." }],
+      "outcomes": [
+        { "id": "fact_checks_spread", "message": "Independent fact-checkers and teachers circulate the evidence index nationally.", "base_weight": 48, "progress_min": 8, "progress_max": 14, "effect": { "community_support": 8, "public_attention": 6, "values": { "disinformation_resilience": 10 } }, "conditions": [{ "metric": "integrity", "min": 75, "multiplier": 1.35 }], "visual_event": { "focus_location_id": "media", "animation": "fact-check-network", "effect": "support" } },
+        { "id": "limited_reach", "message": "The evidence index helps committed supporters but reaches few undecided citizens.", "base_weight": 38, "progress_min": 3, "progress_max": 7, "effect": { "values": { "disinformation_resilience": 5 } }, "conditions": [], "visual_event": { "focus_location_id": "media", "animation": "digital-campaign", "effect": "neutral" } },
+        { "id": "doxxing_attempt", "message": "Anonymous accounts publish organizers' details, forcing the campaign to pause public activity.", "base_weight": 14, "progress_min": 0, "progress_max": 3, "effect": { "resources": { "energy": -7, "days_remaining": -4 }, "values": { "crackdown": 7 } }, "conditions": [{ "metric": "minister_support", "min": 65, "multiplier": 1.4 }], "visual_event": { "focus_location_id": "media", "animation": "online-harassment", "effect": "danger" } }
+      ]
+    }
+  ]
+}

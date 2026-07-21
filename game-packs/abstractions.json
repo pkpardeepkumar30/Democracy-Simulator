@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "categories": {
+    "world_region": [
+      { "id": "south_asian_megacity", "label": "South Asian megacity", "palette": { "primary_color": "#173b57", "accent_color": "#e89035", "background_color": "#eef5f7" }, "effects": { "event_chance_multiplier": 1.08 } },
+      { "id": "northern_european_municipality", "label": "Northern European municipality", "palette": { "primary_color": "#24485a", "accent_color": "#d29a3a", "background_color": "#edf4f4" }, "effects": { "action_cost_multiplier": 0.94, "event_chance_multiplier": 0.9 } },
+      { "id": "west_african_capital", "label": "West African capital", "palette": { "primary_color": "#344726", "accent_color": "#dc8c28", "background_color": "#f5f0df" }, "effects": { "event_chance_multiplier": 1.05 } },
+      { "id": "latin_american_provincial_city", "label": "Latin American provincial city", "palette": { "primary_color": "#553b52", "accent_color": "#e19b48", "background_color": "#f5eee8" } },
+      { "id": "north_american_suburb", "label": "North American suburb", "palette": { "primary_color": "#304a68", "accent_color": "#bd713c", "background_color": "#edf1f5" } },
+      { "id": "east_asian_industrial_city", "label": "East Asian industrial city", "palette": { "primary_color": "#314448", "accent_color": "#d35f42", "background_color": "#edf0ed" }, "effects": { "action_cost_multiplier": 0.97 } },
+      { "id": "middle_eastern_coastal_city", "label": "Middle Eastern coastal city", "palette": { "primary_color": "#284f5b", "accent_color": "#d89d4c", "background_color": "#f4efe5" } },
+      { "id": "central_european_town", "label": "Central European town", "palette": { "primary_color": "#34485d", "accent_color": "#b77b45", "background_color": "#f0f1ef" } },
+      { "id": "southeast_asian_island_city", "label": "Southeast Asian island city", "palette": { "primary_color": "#145567", "accent_color": "#dc8b38", "background_color": "#eaf4f1" }, "effects": { "event_chance_multiplier": 1.1 } },
+      { "id": "small_rural_democracy", "label": "Small rural democracy", "palette": { "primary_color": "#405132", "accent_color": "#c68736", "background_color": "#f2f0df" }, "effects": { "action_cost_multiplier": 1.04 } },
+      { "id": "post_conflict_capital", "label": "Post-conflict capital", "palette": { "primary_color": "#4e4140", "accent_color": "#db7d43", "background_color": "#f1ebe5" }, "effects": { "starting_resource_multiplier": 0.9, "event_chance_multiplier": 1.25, "hidden_range_shift": 8 } },
+      { "id": "federal_metropolitan_region", "label": "Federal metropolitan region", "palette": { "primary_color": "#293d62", "accent_color": "#b9803e", "background_color": "#edf0f5" }, "effects": { "action_cost_multiplier": 1.05 } }
+    ],
+    "government_level": [
+      { "id": "neighborhood", "label": "Neighborhood", "effects": { "action_cost_multiplier": 0.9 } },
+      { "id": "village", "label": "Village", "effects": { "action_cost_multiplier": 0.92 } },
+      { "id": "municipality", "label": "Municipality" },
+      { "id": "district", "label": "District", "effects": { "action_cost_multiplier": 1.03 } },
+      { "id": "province_state", "label": "Province/state", "effects": { "action_cost_multiplier": 1.07 } },
+      { "id": "federal_national", "label": "Federal/national", "effects": { "action_cost_multiplier": 1.12 } },
+      { "id": "supranational", "label": "Supranational", "effects": { "action_cost_multiplier": 1.18 } }
+    ],
+    "political_system": [
+      { "id": "parliamentary_democracy", "label": "Parliamentary democracy" },
+      { "id": "presidential_democracy", "label": "Presidential democracy" },
+      { "id": "federal_democracy", "label": "Federal democracy", "effects": { "action_cost_multiplier": 1.04 } },
+      { "id": "unitary_democracy", "label": "Unitary democracy" },
+      { "id": "coalition_government", "label": "Coalition government", "effects": { "event_chance_multiplier": 1.08 } },
+      { "id": "minority_government", "label": "Minority government", "effects": { "event_chance_multiplier": 1.15 } },
+      { "id": "dominant_party_democracy", "label": "Dominant-party democracy", "effects": { "hidden_range_shift": 5 } },
+      { "id": "transitional_democracy", "label": "Transitional democracy", "effects": { "event_chance_multiplier": 1.2, "hidden_range_shift": 7 } },
+      { "id": "local_council_democracy", "label": "Local council democracy" },
+      { "id": "semi_presidential_system", "label": "Semi-presidential system", "effects": { "event_chance_multiplier": 1.05 } }
+    ],
+    "administrative_capacity": [
+      { "id": "highly_capable", "label": "Highly capable", "effects": { "action_cost_multiplier": 0.82, "event_chance_multiplier": 0.82 } },
+      { "id": "capable_overloaded", "label": "Capable but overloaded" },
+      { "id": "uneven", "label": "Uneven", "effects": { "action_cost_multiplier": 1.06, "event_chance_multiplier": 1.08 } },
+      { "id": "weak", "label": "Weak", "effects": { "action_cost_multiplier": 1.22, "event_chance_multiplier": 1.18, "hidden_range_shift": 10 } },
+      { "id": "digitized_rigid", "label": "Digitized but rigid", "effects": { "action_cost_multiplier": 1.04, "event_chance_multiplier": 0.92 } },
+      { "id": "paper_based", "label": "Paper-based", "effects": { "action_cost_multiplier": 1.12, "event_chance_multiplier": 1.08 } },
+      { "id": "fragmented_agencies", "label": "Fragmented across agencies", "effects": { "action_cost_multiplier": 1.18 } },
+      { "id": "emergency_administration", "label": "Emergency administration", "effects": { "action_cost_multiplier": 1.08, "event_chance_multiplier": 1.22 } }
+    ],
+    "corruption_structure": [
+      { "id": "low_corruption", "label": "Low corruption", "effects": { "hidden_range_shift": -12 } },
+      { "id": "petty_corruption", "label": "Petty corruption", "effects": { "action_cost_multiplier": 1.05, "hidden_range_shift": 4 } },
+      { "id": "procurement_corruption", "label": "Procurement corruption", "effects": { "action_cost_multiplier": 1.1, "hidden_range_shift": 8 } },
+      { "id": "political_patronage", "label": "Political patronage", "effects": { "event_chance_multiplier": 1.08, "hidden_range_shift": 9 } },
+      { "id": "broker_mediated", "label": "Broker-mediated system", "effects": { "action_cost_multiplier": 1.08, "hidden_range_shift": 7 } },
+      { "id": "elite_capture", "label": "Elite capture", "effects": { "starting_resource_multiplier": 0.9, "hidden_range_shift": 13 } },
+      { "id": "land_record_corruption", "label": "Land-record corruption", "effects": { "action_cost_multiplier": 1.12, "hidden_range_shift": 10 } },
+      { "id": "police_corruption", "label": "Police corruption", "effects": { "event_chance_multiplier": 1.12, "hidden_range_shift": 10 } },
+      { "id": "regulatory_capture", "label": "Regulatory capture", "effects": { "action_cost_multiplier": 1.14, "hidden_range_shift": 11 } }
+    ],
+    "rule_of_law": [
+      { "id": "strong_predictable", "label": "Strong and predictable", "effects": { "event_chance_multiplier": 0.88 } },
+      { "id": "slow_independent", "label": "Slow but independent", "effects": { "action_cost_multiplier": 1.06 } },
+      { "id": "unevenly_enforced", "label": "Unevenly enforced", "effects": { "event_chance_multiplier": 1.08, "hidden_range_shift": 4 } },
+      { "id": "politically_influenced", "label": "Politically influenced", "effects": { "event_chance_multiplier": 1.12, "hidden_range_shift": 8 } },
+      { "id": "accessible_expensive", "label": "Accessible but expensive", "effects": { "action_cost_multiplier": 1.12 } },
+      { "id": "inaccessible", "label": "Inaccessible to ordinary citizens", "effects": { "action_cost_multiplier": 1.2, "starting_resource_multiplier": 0.92 } },
+      { "id": "strong_constitutional_court", "label": "Strong constitutional court", "effects": { "event_chance_multiplier": 0.94 } },
+      { "id": "weak_lower_courts", "label": "Weak lower courts", "effects": { "action_cost_multiplier": 1.1, "event_chance_multiplier": 1.08 } }
+    ],
+    "media_environment": [
+      { "id": "free_competitive", "label": "Free and competitive" },
+      { "id": "polarized", "label": "Polarized", "effects": { "event_chance_multiplier": 1.08 } },
+      { "id": "state_dominated", "label": "State-dominated", "effects": { "starting_value_deltas": { "public_attention": -8 } } },
+      { "id": "strong_local_media", "label": "Strong local media", "effects": { "starting_value_deltas": { "public_attention": 6 } } },
+      { "id": "social_media_driven", "label": "Social-media-driven", "effects": { "event_chance_multiplier": 1.12, "starting_value_deltas": { "public_attention": 8 } } },
+      { "id": "investigative_journalism", "label": "Strong investigative journalism", "effects": { "starting_value_deltas": { "documentation": 6 } } },
+      { "id": "censored", "label": "Censored", "effects": { "starting_value_deltas": { "public_attention": -12 }, "hidden_range_shift": 5 } },
+      { "id": "disinformation_heavy", "label": "Disinformation-heavy", "effects": { "event_chance_multiplier": 1.18, "starting_value_deltas": { "community_support": -6 } } },
+      { "id": "low_public_trust", "label": "Low public trust", "effects": { "starting_value_deltas": { "community_support": -10 } } }
+    ],
+    "civil_society_strength": [
+      { "id": "strong_ngos", "label": "Strong NGOs", "effects": { "starting_value_deltas": { "community_support": 6 } } },
+      { "id": "strong_unions", "label": "Strong unions", "effects": { "starting_value_deltas": { "community_support": 8 } } },
+      { "id": "resident_associations", "label": "Strong resident associations", "effects": { "starting_value_deltas": { "community_support": 8 } } },
+      { "id": "student_activism", "label": "Student-led activism", "effects": { "starting_value_deltas": { "community_support": 6, "public_attention": 4 } } },
+      { "id": "religious_organizations", "label": "Religious organizations dominate" },
+      { "id": "weak_civic_organization", "label": "Weak civic organization", "effects": { "starting_value_deltas": { "community_support": -10 } } },
+      { "id": "fragmented_activism", "label": "Fragmented activism", "effects": { "starting_value_deltas": { "community_support": -6 } } },
+      { "id": "professional_associations", "label": "Strong professional associations", "effects": { "starting_value_deltas": { "documentation": 5 } } }
+    ],
+    "economic_condition": [
+      { "id": "stable_growth", "label": "Stable growth" },
+      { "id": "recession", "label": "Recession", "effects": { "starting_resource_multiplier": 0.88 } },
+      { "id": "high_unemployment", "label": "High unemployment", "effects": { "starting_resource_multiplier": 0.9, "event_chance_multiplier": 1.08 } },
+      { "id": "inflation_crisis", "label": "Inflation crisis", "effects": { "starting_resource_multiplier": 0.82, "action_cost_multiplier": 1.15 } },
+      { "id": "austerity", "label": "Austerity", "effects": { "starting_resource_multiplier": 0.9, "action_cost_multiplier": 1.08 } },
+      { "id": "commodity_boom", "label": "Commodity boom", "effects": { "starting_resource_multiplier": 1.12 } },
+      { "id": "housing_crisis", "label": "Housing crisis", "effects": { "action_cost_multiplier": 1.08 } },
+      { "id": "post_disaster_recovery", "label": "Post-disaster recovery", "effects": { "event_chance_multiplier": 1.2, "action_cost_multiplier": 1.08 } },
+      { "id": "debt_crisis", "label": "Debt crisis", "effects": { "starting_resource_multiplier": 0.82, "event_chance_multiplier": 1.1 } }
+    ],
+    "inequality_level": [
+      { "id": "low", "label": "Low", "effects": { "starting_resource_multiplier": 1.08 } },
+      { "id": "moderate", "label": "Moderate" },
+      { "id": "high", "label": "High", "effects": { "starting_resource_multiplier": 0.94, "hidden_range_shift": 3 } },
+      { "id": "extreme", "label": "Extreme", "effects": { "starting_resource_multiplier": 0.84, "hidden_range_shift": 8 } },
+      { "id": "regional_inequality", "label": "Regional inequality", "effects": { "starting_resource_multiplier": 0.92 } },
+      { "id": "rural_urban_divide", "label": "Rural-urban divide", "effects": { "action_cost_multiplier": 1.06 } },
+      { "id": "linguistic_disparity", "label": "Linguistic disparity", "effects": { "action_cost_multiplier": 1.06 } },
+      { "id": "digital_divide", "label": "Digital divide", "effects": { "action_cost_multiplier": 1.07 } }
+    ],
+    "player_role": [
+      { "id": "ordinary_citizen", "label": "Ordinary citizen" },
+      { "id": "small_business_owner", "label": "Small business owner", "effects": { "starting_resource_multiplier": 1.05 } },
+      { "id": "student", "label": "Student", "effects": { "starting_resource_multiplier": 0.88, "starting_value_deltas": { "energy": 8 } } },
+      { "id": "teacher", "label": "Teacher", "effects": { "starting_value_deltas": { "documentation": 5 } } },
+      { "id": "farmer", "label": "Farmer" },
+      { "id": "public_employee", "label": "Public employee", "effects": { "starting_value_deltas": { "influence": 5 } } },
+      { "id": "journalist", "label": "Journalist", "effects": { "starting_value_deltas": { "public_attention": 8 } } },
+      { "id": "lawyer", "label": "Lawyer", "effects": { "starting_value_deltas": { "documentation": 8 } } },
+      { "id": "community_organizer", "label": "Community organizer", "effects": { "starting_value_deltas": { "community_support": 10 } } },
+      { "id": "local_politician", "label": "Local politician", "effects": { "starting_value_deltas": { "influence": 10 } } },
+      { "id": "civil_servant", "label": "Civil servant", "effects": { "starting_value_deltas": { "influence": 6 } } },
+      { "id": "activist", "label": "Activist", "effects": { "starting_value_deltas": { "community_support": 8 } } },
+      { "id": "investor", "label": "Investor", "effects": { "starting_resource_multiplier": 1.18 } },
+      { "id": "migrant_worker", "label": "Migrant worker", "effects": { "starting_resource_multiplier": 0.82 } },
+      { "id": "parent", "label": "Parent" },
+      { "id": "healthcare_worker", "label": "Healthcare worker", "effects": { "starting_value_deltas": { "community_support": 5 } } }
+    ],
+    "objective_type": [
+      { "id": "infrastructure", "label": "Improve infrastructure", "description": "Repair a neglected public asset before a civic deadline." },
+      { "id": "accountability", "label": "Demand political accountability", "description": "Build a credible movement after a public scandal." },
+      { "id": "business_land", "label": "Open a regulated business", "description": "Secure land, community agreement, finance, permits, and utilities." }
+    ]
+  },
+  "difficulties": [
+    { "id": "accessible", "label": "Accessible", "description": "More resources, lower costs, and fewer disruptions.", "effects": { "starting_resource_multiplier": 1.2, "action_cost_multiplier": 0.84, "event_chance_multiplier": 0.75, "hidden_range_shift": -8 } },
+    { "id": "standard", "label": "Standard", "description": "The intended stochastic balance." },
+    { "id": "hard", "label": "Hard", "description": "Tighter resources, higher costs, and more disruptions while every installed objective remains reachable.", "effects": { "starting_resource_multiplier": 0.95, "action_cost_multiplier": 1.05, "event_chance_multiplier": 1.15, "hidden_range_shift": 5 } }
+  ],
+  "modifiers": [
+    { "id": "election_30_days", "label": "Election in 30 days", "effects": { "event_chance_multiplier": 1.12 } },
+    { "id": "one_seat_majority", "label": "Government has a one-seat majority", "effects": { "event_chance_multiplier": 1.08 } },
+    { "id": "courts_strike", "label": "Courts are on strike", "effects": { "action_cost_multiplier": 1.12 } },
+    { "id": "public_trust_low", "label": "Public trust is low", "effects": { "starting_value_deltas": { "community_support": -10 } } },
+    { "id": "social_media_influential", "label": "Social media is highly influential", "effects": { "starting_value_deltas": { "public_attention": 8 }, "event_chance_multiplier": 1.08 } },
+    { "id": "inflation_high", "label": "Inflation is high", "effects": { "starting_resource_multiplier": 0.9, "action_cost_multiplier": 1.12 } },
+    { "id": "severe_rainfall", "label": "Severe rainfall is expected", "effects": { "event_chance_multiplier": 1.18 } },
+    { "id": "family_emergency", "label": "Player has a family emergency", "effects": { "starting_resource_multiplier": 0.86 } },
+    { "id": "whistleblower", "label": "A whistleblower is available", "effects": { "starting_value_deltas": { "documentation": 12 } } },
+    { "id": "international_attention", "label": "International attention is rising", "effects": { "starting_value_deltas": { "public_attention": 10 } } },
+    { "id": "anti_corruption_law", "label": "A new anti-corruption law was passed", "effects": { "hidden_range_shift": -8 } },
+    { "id": "portal_malfunction", "label": "Government portal is malfunctioning", "effects": { "action_cost_multiplier": 1.1 } },
+    { "id": "budget_exhausted", "label": "City budget is nearly exhausted", "effects": { "starting_resource_multiplier": 0.9, "event_chance_multiplier": 1.1 } },
+    { "id": "leaked_document", "label": "Leaked document changes opinion", "effects": { "starting_value_deltas": { "documentation": 10, "public_attention": 6 } } },
+    { "id": "assembly_restrictions", "label": "Police impose assembly restrictions", "effects": { "action_cost_multiplier": 1.08, "event_chance_multiplier": 1.12 } },
+    { "id": "support_high", "label": "Public support starts high", "effects": { "starting_value_deltas": { "community_support": 12 } } },
+    { "id": "support_hostile", "label": "Public support starts hostile", "effects": { "starting_value_deltas": { "community_support": -14 } } }
+  ],
+  "constraints": [
+    {
+      "id": "local_legal_scale",
+      "message": "Neighborhood and village missions need an ordinary local legal route rather than an immediate constitutional-court setting.",
+      "when": { "government_level": ["neighborhood", "village"] },
+      "require": { "rule_of_law": ["strong_predictable", "slow_independent", "unevenly_enforced", "accessible_expensive", "weak_lower_courts"] }
+    },
+    {
+      "id": "transitional_administration",
+      "message": "A transitional democracy requires an uneven, weak, fragmented, paper-based, or emergency administration.",
+      "when": { "political_system": ["transitional_democracy"] },
+      "require": { "administrative_capacity": ["uneven", "weak", "paper_based", "fragmented_agencies", "emergency_administration"] }
+    }
+  ],
+  "templates": [
+    {
+      "pack_id": "civic-drainage-v1",
+      "objective_types": ["infrastructure"],
+      "limits": { "min_starting_resource_multiplier": 0.72, "max_action_cost_multiplier": 1.35, "max_event_chance_multiplier": 1.7 },
+      "constraints": [{
+        "id": "infrastructure_scale",
+        "message": "The installed infrastructure template operates from neighborhood through province/state level.",
+        "require": { "government_level": ["neighborhood", "village", "municipality", "district", "province_state"] }
+      }]
+    },
+    {
+      "pack_id": "examination-scandal-v1",
+      "objective_types": ["accountability"],
+      "limits": { "min_starting_resource_multiplier": 0.8, "max_action_cost_multiplier": 1.25, "max_event_chance_multiplier": 1.6 },
+      "constraints": [{
+        "id": "ministerial_scale",
+        "message": "Ministerial-accountability missions require a province/state, federal/national, or supranational setting.",
+        "require": { "government_level": ["province_state", "federal_national", "supranational"] }
+      }]
+    },
+    {
+      "pack_id": "factory-ground-v1",
+      "objective_types": ["business_land"],
+      "limits": { "min_starting_resource_multiplier": 0.9, "max_action_cost_multiplier": 1.15, "max_event_chance_multiplier": 1.5 },
+      "constraints": [{
+        "id": "business_land_scale",
+        "message": "The installed land-and-factory template requires municipal through federal authority.",
+        "require": { "government_level": ["municipality", "district", "province_state", "federal_national"] }
+      }]
+    }
+  ]
+}

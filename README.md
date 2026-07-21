@@ -1,13 +1,17 @@
-# The Republic — Civic Simulation MVP
+# Democracy Simulator
 
-A playable stochastic civic-strategy game. The first mission asks a citizen to get a neglected neighbourhood drainage system repaired before money, energy and time run out.
+A reusable, data-driven civic-simulation platform. The initial library contains three stochastic environments: repair a flooded ward, organize accountability after a national examination leak, and lawfully acquire land and approvals for a food-processing factory.
 
 The package contains:
 
 - A low-latency Rust game server using Axum and Tokio.
 - A responsive browser game served by the Rust binary.
+- A locally bundled Phaser 3 civic-city renderer with code-native theme visuals, server-driven animations, reduced-motion handling and a DOM fallback.
 - Persistent saved sessions stored in a Docker volume.
-- A data-driven JSON game pack with three citizens, eight actions and multiple weighted outcomes.
+- A validated schema-v2 JSON/YAML game-pack library with three complete environments, nine player profiles, 31 state-gated actions, declarative institutions, stakeholders, hidden variables, random events, endings and visual themes.
+- A multi-scenario registry and catalog API; adding a validated `game.json` directory does not require engine changes.
+- A typed world-abstraction catalog and deterministic scenario composer with selectable environment dimensions, roles, objectives, modifiers and difficulty.
+- Optional cross-mission campaigns that preserve complete histories and carry pack-declared reputation, knowledge, relationships and consequences into later missions.
 - Seeded stochastic decisions and idempotent action requests.
 - An installable progressive web app suitable for phone testing.
 - An Expo/React Native client for later Android and iOS packaging.
@@ -81,14 +85,16 @@ docker compose down -v
 
 Follow `MANUAL_TEST_CHECKLIST.md`. The minimum useful test is:
 
-1. Select **Ramesh Kumar**.
-2. Confirm that some actions are initially locked.
+1. Select an environment, then select a player profile such as **Ramesh Kumar**.
+2. Confirm that only actions valid in the initial state are shown; locked actions are absent rather than disabled.
 3. File a formal complaint.
-4. Confirm that money, energy, days and progress change.
+4. Confirm that money, energy, days and several civic factors change; there is no generic progress-only victory bar.
 5. Refresh the browser; the same session should return.
-6. Try building documentation and community support.
-7. Observe how actions such as media escalation and court action unlock.
-8. Start a new game with another citizen and compare the constraints.
+6. Try building evidence strength, public support, media pressure, institutional pressure and movement unity while reducing government resistance.
+7. Observe how valid actions appear as their prerequisites are met and disappear after their one meaningful use.
+8. In the examination scenario, advance evidence from unverified through independent verification, corroboration, confirmed chain of custody and legal admissibility.
+9. If a whistleblower packet arrives, confirm that the new **Verify whistleblower evidence** action appears.
+10. Start a new game with another citizen and compare the constraints.
 
 Outcomes are stochastic. Restarting a session creates a new hidden administrative context and random seed.
 
@@ -115,6 +121,18 @@ With the game running, use Git Bash, WSL, macOS or Linux:
 ```
 
 The script checks health, scenario loading, session creation and the first stochastic action.
+
+The visual bundle has its own reproducible checks:
+
+```powershell
+cd web
+npm ci
+npm run typecheck
+npm test
+npm run build
+```
+
+With a server running, `npm run e2e` uses a locally installed Chromium/Edge executable supplied through `BROWSER_PATH`. It verifies desktop/mobile canvas layout and submits a real server action by clicking a Phaser location.
 
 You can also inspect the health endpoint directly:
 
@@ -159,14 +177,14 @@ civic-sim-mvp/
 └── MANUAL_TEST_CHECKLIST.md
 ```
 
-## Reuse the image for another game
+## Add another environment
 
-The server loads a game pack from `GAME_PACK_PATH`. To create another game:
+The server discovers every `game.json`, `game.yaml` or `game.yml` below `GAME_PACKS_PATH` (default `game-packs`). `GAME_PACK_PATH` remains available for a single legacy/custom pack. To create another environment:
 
 1. Copy `game-packs/drainage/game.json` into a new folder.
-2. Change the mission, citizen profiles, actions, costs, requirements and weighted outcomes.
-3. Validate the JSON syntax.
-4. Mount the folder into the existing image.
+2. Change the environment profile, mission, value definitions, player profiles, institutions, stakeholders, barriers, random events, endings, visual theme and actions.
+3. Validate the pack using the server tests/validator.
+4. Place it below `game-packs/` or mount its directory into the existing image.
 
 An example override is provided in `compose.custom-pack.example.yaml`:
 
@@ -176,8 +194,20 @@ docker compose -f compose.yaml -f compose.custom-pack.example.yaml up --build
 
 See `GAME_PACK_GUIDE.md` for the format.
 
-## Current MVP boundaries
+## Balance and simulation tooling
 
-This release deliberately uses an atomic JSON session store rather than PostgreSQL. For the intended local test and a small number of users, this removes an unnecessary service and gives a single-container package. The engine, API and storage module are separated so the store can later be replaced with PostgreSQL without changing the game rules or clients.
+Run deterministic, goal-directed Monte Carlo simulations across every role and discovered scenario inside the pinned builder:
 
-The first release contains one complete mission. Government-job recruitment, multiplayer roles, authentication, cloud synchronization and an admin scenario editor are not implemented yet.
+```bash
+cargo run --bin simulate -- 250
+cargo run --bin simulate -- trace factory-ground-v1 local_entrepreneur 17
+cargo run --bin simulate -- generated business_land hard 250
+```
+
+The first command reports status/ending distributions. The trace command explains one action path turn by turn. The generated form composes a deterministic objective/difficulty environment and checks its reachability with the same policy.
+
+## Current platform boundaries
+
+This release still uses an atomic JSON session store rather than PostgreSQL. The engine, pack registry, API and storage module are separated so storage can later be replaced without changing scenario rules or clients.
+
+Schema-v2 packs, multi-environment selection, generic variables, random events, declarative endings, JSON/YAML loading, persistent generated worlds, coherence and difficulty overlays, cross-mission campaigns, the shared Phaser/DOM visual system and Expo random-world flow are implemented. Authentication, multiplayer roles, external pack-art pipelines and an admin scenario editor remain future work tracked in `docs/ENVIRONMENT_LIBRARY_PROGRESS.md`.

@@ -1,0 +1,23 @@
+{
+  "name": "democracy-simulator-visual-city",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "e2e": "node e2e/visual-city.mjs",
+    "e2e:standalone": "node e2e/standalone.mjs",
+    "standalone": "node ../scripts/build-standalone.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "phaser": "3.90.0"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "playwright-core": "1.61.1",
+    "vite": "7.3.6",
+    "vitest": "4.1.10"
+  }
+}

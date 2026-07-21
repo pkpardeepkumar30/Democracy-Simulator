@@ -1,13 +1,130 @@
 {
+  "schema_version": 2,
   "id": "civic-drainage-v1",
   "title": "The Republic: Drainage Mission",
   "description": "A stochastic civic-strategy scenario about getting a neglected neighbourhood drainage system repaired before time, money and energy run out.",
-  "version": "1.0.0",
+  "version": "1.1.0",
+  "campaign": {
+    "imports": [
+      { "source_id": "civic_reputation", "target_id": "community_support", "multiplier": 0.25, "min": -15, "max": 15 },
+      { "source_id": "institutional_knowledge", "target_id": "documentation", "multiplier": 0.2, "min": -12, "max": 12 },
+      { "source_id": "civic_network", "target_id": "influence", "multiplier": 0.2, "min": -10, "max": 12 }
+    ],
+    "exports": [
+      { "source_id": "integrity", "target_id": "civic_reputation", "multiplier": 0.15, "source_offset": 50, "min": -8, "max": 8 },
+      { "source_id": "documentation", "target_id": "institutional_knowledge", "multiplier": 0.1, "source_offset": 40, "min": -5, "max": 6 },
+      { "source_id": "community_support", "target_id": "civic_network", "multiplier": 0.1, "source_offset": 40, "min": -5, "max": 6 }
+    ],
+    "won_effect": { "civic_reputation": 8, "institutional_knowledge": 5, "civic_network": 6 },
+    "lost_effect": { "civic_reputation": -3, "civic_network": -2 }
+  },
+  "environment": {
+    "world_region": "South Asian megacity",
+    "government_level": "Municipality",
+    "political_system": "Local council democracy",
+    "administrative_capacity": "Capable but overloaded",
+    "corruption_structure": "Broker-mediated system",
+    "rule_of_law": "Slow but independent",
+    "media_environment": "Strong local media",
+    "civil_society_strength": "Strong resident associations",
+    "economic_condition": "Stable growth",
+    "inequality_level": "High",
+    "modifiers": ["Severe rainfall is expected", "Election in 180 days"]
+  },
   "mission": {
     "title": "Repair the neighbourhood drainage",
     "objective": "Get the municipal drainage repair completed and verified before the monsoon deadline.",
     "starting_status": "Residents have complained informally, but no official case exists.",
-    "win_progress": 100
+    "win_progress": 100,
+    "objective_type": "Improve infrastructure",
+    "time_horizon": "180 days before peak monsoon"
+  },
+  "value_definitions": [
+    { "id": "money", "label": "Campaign funds", "group": "resource", "min": -10000, "max": 50000, "format": "money" },
+    { "id": "energy", "label": "Energy", "group": "resource", "min": 0, "max": 100, "format": "percent" },
+    { "id": "influence", "label": "Influence", "group": "resource", "min": 0, "max": 100, "format": "percent" },
+    { "id": "days_remaining", "label": "Days to monsoon", "group": "resource", "min": 0, "max": 180, "format": "days" },
+    { "id": "progress", "label": "Legacy progress", "group": "metric", "min": 0, "max": 100, "format": "percent", "hidden_from_hud": true },
+    { "id": "documentation", "label": "Evidence strength", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "community_support", "label": "Public support", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "public_attention", "label": "Media pressure", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "integrity", "label": "Integrity", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "institutional_pressure", "label": "Institutional pressure", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "movement_unity", "label": "Movement unity", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "government_resistance", "label": "Government resistance", "group": "metric", "min": 0, "max": 100, "format": "percent" },
+    { "id": "complaint_filed", "label": "Complaint filed", "group": "metric", "min": 0, "max": 1, "format": "number", "hidden_from_hud": true },
+    { "id": "office_response_received", "label": "Office response received", "group": "metric", "min": 0, "max": 1, "format": "number", "hidden_from_hud": true },
+    { "id": "flood_damage", "label": "Flood damage", "group": "metric", "min": 0, "max": 100, "format": "percent", "hidden_from_hud": true }
+  ],
+  "hidden_variable_definitions": [
+    { "id": "contractor_influence", "min": 20, "max": 90 },
+    { "id": "available_budget", "min": 25, "max": 90 },
+    { "id": "election_sensitivity", "min": 10, "max": 90 },
+    { "id": "rain_probability", "min": 35, "max": 95 }
+  ],
+  "institutions": [
+    { "id": "ward_office", "name": "Ward Office", "institution_type": "Municipal office", "description": "Registers complaints and coordinates the local response." },
+    { "id": "public_works", "name": "Public Works Department", "institution_type": "Development authority", "description": "Inspects, budgets, procures and supervises drainage work." },
+    { "id": "local_court", "name": "Metropolitan Civic Court", "institution_type": "Court", "description": "Reviews administrative delay and emergency public-safety petitions." },
+    { "id": "local_media", "name": "Ward News Network", "institution_type": "Local media", "description": "Reports neighborhood problems and municipal responses." }
+  ],
+  "stakeholders": [
+    { "id": "engineer", "name": "Junior Engineer Kavita Rao", "archetype": "Honest but overloaded official", "institution_id": "public_works", "interests": ["safe infrastructure", "manageable workload"], "fears": ["audit blame", "contractor delay"], "public_description": "The engineer can order an inspection but manages a large backlog." },
+    { "id": "councillor", "name": "Councillor Dev Malik", "archetype": "Government politician", "institution_id": "ward_office", "interests": ["reelection", "visible delivery"], "fears": ["public anger"], "public_description": "The councillor is sensitive to organized resident pressure." },
+    { "id": "contractor", "name": "Metro Civil Works", "archetype": "Developer", "institution_id": "public_works", "interests": ["profitable contract"], "fears": ["audit", "penalties"], "public_description": "The incumbent contractor controls equipment and crews." },
+    { "id": "residents", "name": "Nayi Basti Residents", "archetype": "Resident association", "interests": ["drainage repair", "flood prevention"], "fears": ["retaliation", "lost wages"], "public_description": "Residents can supply evidence, volunteers and political pressure." },
+    { "id": "journalist", "name": "Anika Sen", "archetype": "Journalist", "institution_id": "local_media", "interests": ["documented public-interest stories"], "fears": ["publishing weak claims"], "public_description": "A local reporter who needs a credible paper trail." }
+  ],
+  "barriers": [
+    { "id": "missing_record", "title": "No traceable complaint", "barrier_type": "Missing document", "description": "Informal complaints cannot enter inspection or appeal routes." },
+    { "id": "backlog", "title": "Engineering backlog", "barrier_type": "Application backlog", "description": "Inspections and work orders compete with many pending cases." },
+    { "id": "budget_uncertainty", "title": "Uncertain ward budget", "barrier_type": "Budget freeze", "description": "Even an approved repair may wait for funds." }
+  ],
+  "random_events": [
+    {
+      "id": "early_monsoon_burst",
+      "title": "Early monsoon burst",
+      "message": "A severe rain burst floods the ward before permanent work is complete.",
+      "chance_per_turn": 0.08,
+      "once": true,
+      "conditions": [{ "metric": "days_remaining", "max": 90 }],
+      "effect": { "resources": { "energy": -8, "days_remaining": -10 }, "values": { "flood_damage": 100 }, "progress": -5 },
+      "visual_event": { "focus_location_id": "drain", "animation": "heavy-rain", "effect": "danger" }
+    },
+    {
+      "id": "budget_reallocation",
+      "title": "Emergency budget reallocation",
+      "message": "The city diverts part of the ward budget to another emergency, slowing the case.",
+      "chance_per_turn": 0.06,
+      "once": true,
+      "conditions": [{ "metric": "institutional_pressure", "min": 20, "max": 75 }],
+      "effect": { "resources": { "days_remaining": -12 }, "values": { "government_resistance": 8 } },
+      "visual_event": { "focus_location_id": "public_works", "animation": "budget-freeze", "effect": "setback" }
+    }
+  ],
+  "endings": [
+    { "id": "full_repair", "title": "Full repair", "message": "The drainage repair is completed and verified before the monsoon.", "status": "won", "conditions": [{ "metric": "documentation", "min": 40 }, { "metric": "community_support", "min": 35 }, { "metric": "institutional_pressure", "min": 55 }, { "metric": "government_resistance", "max": 45 }] },
+    { "id": "court_order", "title": "Binding court order", "message": "The court imposes a monitored repair deadline, securing the ward's objective.", "status": "won", "conditions": [{ "metric": "documentation", "min": 60 }, { "metric": "institutional_pressure", "min": 70 }, { "metric": "integrity", "min": 60 }] },
+    { "id": "temporary_cleanup", "title": "Temporary cleanup", "message": "An emergency cleanup reduces the immediate danger, although permanent reconstruction remains unfinished.", "status": "won", "conditions": [{ "metric": "community_support", "min": 25 }, { "metric": "public_attention", "min": 25 }, { "metric": "movement_unity", "min": 30 }] },
+    { "id": "flood_before_completion", "title": "Flood before completion", "message": "The monsoon arrives before the system is repaired and the ward floods.", "status": "lost", "conditions": [{ "metric": "flood_damage", "min": 100 }] },
+    { "id": "delayed_budget", "title": "Delayed budget", "message": "The case gains recognition, but the deadline expires before funding and procurement are completed.", "status": "lost", "conditions": [{ "metric": "days_remaining", "max": 0 }, { "metric": "progress", "min": 35 }] },
+    { "id": "resource_exhaustion", "title": "Resource exhaustion", "message": "The citizen can no longer sustain the campaign.", "status": "lost", "conditions": [{ "metric": "energy", "max": 0 }] },
+    { "id": "deadline_expired", "title": "Deadline expired", "message": "The monsoon deadline expires before meaningful repair is secured.", "status": "lost", "conditions": [{ "metric": "days_remaining", "max": 0 }] }
+  ],
+  "visual_theme": {
+    "id": "monsoon_ward",
+    "layout": "civic_city_map",
+    "primary_color": "#17324d",
+    "accent_color": "#d88a2d",
+    "background_color": "#e8e1cf",
+    "locations": [
+      { "id": "neighborhood", "label": "Nayi Basti", "x": 18, "y": 68 },
+      { "id": "drain", "label": "Blocked drain", "x": 36, "y": 72 },
+      { "id": "ward_office", "label": "Ward office", "institution_id": "ward_office", "x": 55, "y": 42 },
+      { "id": "public_works", "label": "Public works", "institution_id": "public_works", "x": 72, "y": 32 },
+      { "id": "local_court", "label": "Civic court", "institution_id": "local_court", "x": 82, "y": 58 },
+      { "id": "local_media", "label": "Ward News", "institution_id": "local_media", "x": 48, "y": 20 }
+    ]
   },
   "citizens": [
     {
@@ -28,6 +145,7 @@
         "public_attention": 0,
         "integrity": 100
       },
+      "starting_values": { "institutional_pressure": 0, "movement_unity": 18, "government_resistance": 76, "complaint_filed": 0, "office_response_received": 0 },
       "modifiers": {
         "community": 1.15
       }
@@ -50,6 +168,7 @@
         "public_attention": 0,
         "integrity": 100
       },
+      "starting_values": { "institutional_pressure": 2, "movement_unity": 10, "government_resistance": 72, "complaint_filed": 0, "office_response_received": 0 },
       "modifiers": {
         "documentation": 1.2
       }
@@ -72,6 +191,7 @@
         "public_attention": 0,
         "integrity": 100
       },
+      "starting_values": { "institutional_pressure": 0, "movement_unity": 25, "government_resistance": 80, "complaint_filed": 0, "office_response_received": 0 },
       "modifiers": {
         "energy": 1.15
       }
@@ -82,11 +202,10 @@
       "id": "file_complaint",
       "title": "File a formal complaint",
       "description": "Submit the first written complaint with photographs and receive a tracking number.",
+      "action_type": "File application",
+      "location_id": "ward_office",
       "cost": { "money": 250, "energy": 3, "influence": 0, "days": 3 },
-      "guaranteed_effect": {
-        "documentation": 8,
-        "progress": 3
-      },
+      "guaranteed_effect": { "documentation": 8, "values": { "complaint_filed": 1, "institutional_pressure": 5 } },
       "requirements": [],
       "outcomes": [
         {
@@ -129,10 +248,12 @@
       "id": "visit_office",
       "title": "Visit the municipal office",
       "description": "Spend a day following the file through the clerical and engineering desks.",
+      "action_type": "Visit office",
+      "location_id": "public_works",
       "cost": { "money": 650, "energy": 7, "influence": 0, "days": 5 },
-      "guaranteed_effect": { "documentation": 2 },
+      "guaranteed_effect": { "documentation": 2, "values": { "office_response_received": 1, "institutional_pressure": 10, "government_resistance": -4 } },
       "requirements": [
-        { "metric": "progress", "min": 3, "message": "File a formal complaint first." }
+        { "metric": "complaint_filed", "min": 1, "message": "File a formal complaint first." }
       ],
       "outcomes": [
         {
@@ -173,11 +294,14 @@
       "id": "collect_signatures",
       "title": "Mobilise the neighbourhood",
       "description": "Collect signatures, photographs and short resident statements.",
+      "action_type": "Organize residents",
+      "location_id": "neighborhood",
       "cost": { "money": 500, "energy": 8, "influence": 0, "days": 7 },
       "guaranteed_effect": {
         "community_support": 18,
         "documentation": 7,
-        "public_attention": 3
+        "public_attention": 3,
+        "values": { "movement_unity": 20 }
       },
       "requirements": [],
       "outcomes": [
@@ -218,10 +342,12 @@
       "id": "file_rti",
       "title": "File an information request",
       "description": "Request the file status, responsible officer, budget head and inspection notes.",
+      "action_type": "Request information",
+      "location_id": "ward_office",
       "cost": { "money": 350, "energy": 5, "influence": 0, "days": 12 },
-      "guaranteed_effect": { "documentation": 12 },
+      "guaranteed_effect": { "documentation": 12, "values": { "institutional_pressure": 8 } },
       "requirements": [
-        { "metric": "progress", "min": 8, "message": "A traceable complaint should exist before requesting its records." }
+        { "metric": "complaint_filed", "min": 1, "message": "A traceable complaint should exist before requesting its records." }
       ],
       "outcomes": [
         {
@@ -262,8 +388,10 @@
       "id": "contact_councillor",
       "title": "Approach the ward councillor",
       "description": "Ask the elected representative to push the department and arrange an inspection.",
+      "action_type": "Contact elected representative",
+      "location_id": "ward_office",
       "cost": { "money": 900, "energy": 5, "influence": 8, "days": 5 },
-      "guaranteed_effect": { "public_attention": 5 },
+      "guaranteed_effect": { "public_attention": 5, "values": { "institutional_pressure": 14, "government_resistance": -8 } },
       "requirements": [
         { "metric": "community_support", "min": 25, "message": "Build visible neighbourhood support first." }
       ],
@@ -306,11 +434,13 @@
       "id": "media_campaign",
       "title": "Escalate through local media",
       "description": "Give documented evidence to a local reporter and publish the resident timeline.",
+      "action_type": "Contact media",
+      "location_id": "local_media",
       "cost": { "money": 1400, "energy": 10, "influence": 3, "days": 6 },
-      "guaranteed_effect": { "public_attention": 22 },
+      "guaranteed_effect": { "public_attention": 22, "values": { "institutional_pressure": 10, "government_resistance": -5 } },
       "requirements": [
         { "metric": "documentation", "min": 25, "message": "Gather stronger documentary evidence before contacting media." },
-        { "metric": "community_support", "min": 30, "message": "The story needs credible resident support." }
+        { "metric": "community_support", "min": 25, "message": "The story needs credible resident support." }
       ],
       "outcomes": [
         {
@@ -351,11 +481,13 @@
       "id": "court_case",
       "title": "File a public-interest petition",
       "description": "Engage a lawyer and ask the court for a time-bound municipal response.",
+      "action_type": "File court case",
+      "location_id": "local_court",
       "cost": { "money": 8500, "energy": 15, "influence": 0, "days": 28 },
-      "guaranteed_effect": { "public_attention": 12, "documentation": 10 },
+      "guaranteed_effect": { "public_attention": 12, "documentation": 10, "values": { "institutional_pressure": 25, "government_resistance": -15 } },
       "requirements": [
-        { "metric": "documentation", "min": 45, "message": "A court filing needs a stronger documentary record." },
-        { "metric": "progress", "min": 20, "message": "Demonstrate that administrative remedies were attempted first." }
+        { "metric": "documentation", "min": 35, "message": "A court filing needs a stronger documentary record." },
+        { "metric": "office_response_received", "min": 1, "message": "Demonstrate that the administration was first given a formal opportunity to respond." }
       ],
       "outcomes": [
         {
@@ -395,10 +527,13 @@
       "id": "informal_payment",
       "title": "Make an informal payment",
       "description": "Take a costly illegal shortcut. It may accelerate the file, create further demands or trigger consequences.",
+      "action_type": "Offer informal payment",
+      "location_id": "public_works",
+      "ethical_tags": ["illegal", "integrity_cost", "future_expectation"],
       "cost": { "money": 4500, "energy": 6, "influence": 0, "days": 2 },
-      "guaranteed_effect": { "integrity": -22 },
+      "guaranteed_effect": { "integrity": -22, "values": { "government_resistance": -15, "movement_unity": -12 } },
       "requirements": [
-        { "metric": "progress", "min": 5, "message": "There is not yet a traceable file to influence." }
+        { "metric": "office_response_received", "min": 1, "message": "There is not yet a specific administrative decision to influence." }
       ],
       "outcomes": [
         {

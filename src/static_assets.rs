@@ -9,8 +9,22 @@ pub async fn index() -> Html<&'static str> {
 
 pub async fn app_js() -> Response {
     (
-        [(header::CONTENT_TYPE, "application/javascript; charset=utf-8")],
+        [(
+            header::CONTENT_TYPE,
+            "application/javascript; charset=utf-8",
+        )],
         include_str!("../web/app.js"),
+    )
+        .into_response()
+}
+
+pub async fn city_bundle_js() -> Response {
+    (
+        [(
+            header::CONTENT_TYPE,
+            "application/javascript; charset=utf-8",
+        )],
+        include_str!("../web/dist/city.bundle.js"),
     )
         .into_response()
 }
@@ -33,7 +47,10 @@ pub async fn manifest() -> Response {
 
 pub async fn service_worker() -> Response {
     (
-        [(header::CONTENT_TYPE, "application/javascript; charset=utf-8")],
+        [(
+            header::CONTENT_TYPE,
+            "application/javascript; charset=utf-8",
+        )],
         include_str!("../web/sw.js"),
     )
         .into_response()

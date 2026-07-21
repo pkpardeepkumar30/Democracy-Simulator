@@ -1,0 +1,1015 @@
+DEMOCRACY SIMULATOR — ENVIRONMENT AND SCENARIO LIBRARY
+======================================================
+
+PURPOSE
+-------
+This file is a design cue for Codex. Democracy Simulator must be a reusable civic-simulation platform, not a single drainage-repair game. Players should be able to choose or generate environments inspired by different regions, political systems, administrative cultures, economies, and civic problems.
+
+Use fictional countries, cities, parties, officials, and institutions by default. Real-world systems may inspire mechanics, but scenarios should remain configurable and generalized.
+
+CORE ENVIRONMENT FORMULA
+------------------------
+Every generated environment should combine:
+
+1. World profile
+2. Political system
+3. Administrative culture
+4. Legal system
+5. Economic conditions
+6. Social conditions
+7. Media environment
+8. Player role
+9. Civic objective
+10. Institutions
+11. Stakeholders
+12. Available actions
+13. Hidden variables
+14. Procedural barriers
+15. Random events
+16. Success and failure conditions
+17. Ethical trade-offs
+18. Visual theme
+19. Time horizon
+20. Persistent consequences
+
+The same objective must behave differently under different environments.
+
+Example: acquiring land in a transparent, digitized democracy should depend on planning law, financing, and consultation. The same objective in a patronage-heavy environment may depend on brokers, political access, disputed records, and informal payments. In a fragile democracy, displacement, local conflict, or sudden policy changes may dominate.
+
+COMPOSABLE ABSTRACTIONS
+=======================
+
+01. WORLD_REGION
+----------------
+Possible values:
+- South Asian megacity
+- Northern European municipality
+- West African capital
+- Latin American provincial city
+- North American suburb
+- East Asian industrial city
+- Middle Eastern coastal city
+- Central European town
+- Southeast Asian island city
+- Small rural democracy
+- Post-conflict capital
+- Federal metropolitan region
+
+Controls architecture, climate, transport, road layout, population density, language, visual assets, and common civic problems.
+
+02. GOVERNMENT_LEVEL
+--------------------
+- Neighborhood
+- Village
+- Municipality
+- District
+- Province/state
+- Federal/national
+- Supranational
+
+Controls authority, number of institutions, travel time, appeal routes, and decision scale.
+
+03. POLITICAL_SYSTEM
+--------------------
+- Parliamentary democracy
+- Presidential democracy
+- Federal democracy
+- Unitary democracy
+- Coalition government
+- Minority government
+- Dominant-party democracy
+- Transitional democracy
+- Local council democracy
+- Semi-presidential system
+
+Controls who decides, government stability, coalition bargaining, election pressure, and ministerial accountability.
+
+04. ADMINISTRATIVE_CAPACITY
+---------------------------
+- Highly capable
+- Capable but overloaded
+- Uneven
+- Weak
+- Digitized but rigid
+- Paper-based
+- Fragmented across agencies
+- Emergency administration
+
+Controls processing speed, error rates, queues, repeat submissions, and lost records.
+
+05. CORRUPTION_STRUCTURE
+------------------------
+- Low corruption
+- Petty corruption
+- Procurement corruption
+- Political patronage
+- Broker-mediated system
+- Elite capture
+- Land-record corruption
+- Police corruption
+- Regulatory capture
+
+Controls informal costs, unequal access, retaliation, audit risk, and moral trade-offs.
+
+06. RULE_OF_LAW
+---------------
+- Strong and predictable
+- Slow but independent
+- Unevenly enforced
+- Politically influenced
+- Accessible but expensive
+- Inaccessible to ordinary citizens
+- Strong constitutional court
+- Weak lower courts
+
+Controls court effectiveness, legal cost, appeal success, delay, and enforcement.
+
+07. MEDIA_ENVIRONMENT
+---------------------
+- Free and competitive
+- Polarized
+- State-dominated
+- Strong local media
+- Social-media-driven
+- Strong investigative journalism
+- Censored
+- Disinformation-heavy
+- Low public trust
+
+Controls public pressure, reputation, protest visibility, misinformation, and responsiveness.
+
+08. CIVIL_SOCIETY_STRENGTH
+--------------------------
+- Strong NGOs
+- Strong unions
+- Strong resident associations
+- Student-led activism
+- Religious organizations dominate
+- Weak civic organization
+- Fragmented activism
+- Strong professional associations
+
+Controls mobilization, legal support, volunteers, and coalition building.
+
+09. ECONOMIC_CONDITION
+----------------------
+- Stable growth
+- Recession
+- High unemployment
+- Inflation crisis
+- Austerity
+- Commodity boom
+- Housing crisis
+- Post-disaster recovery
+- Debt crisis
+
+Controls budgets, player resources, protest intensity, job competition, and business viability.
+
+10. INEQUALITY_LEVEL
+--------------------
+- Low
+- Moderate
+- High
+- Extreme
+- Regional inequality
+- Rural-urban divide
+- Linguistic disparity
+- Digital divide
+
+Controls starting resources, access to officials, service quality, and social resentment.
+
+11. PLAYER_ROLE
+---------------
+- Ordinary citizen
+- Small business owner
+- Student
+- Teacher
+- Farmer
+- Public employee
+- Journalist
+- Lawyer
+- Community organizer
+- Local politician
+- Civil servant
+- Activist
+- Investor
+- Migrant worker
+- Parent
+- Healthcare worker
+
+Controls skills, contacts, credibility, risks, and available actions.
+
+12. PLAYER_RESOURCES
+--------------------
+Reusable resources:
+- Money
+- Time
+- Energy
+- Reputation
+- Influence
+- Legal standing
+- Public support
+- Evidence
+- Media attention
+- Political capital
+- Personal safety
+- Family stability
+- Business cash flow
+- Trust
+
+Different scenarios use different subsets.
+
+13. CIVIC_OBJECTIVE_TYPE
+------------------------
+- Obtain public service
+- Correct administrative record
+- Secure employment
+- Start a business
+- Acquire land
+- Challenge government decision
+- Demand investigation
+- Organize protest
+- Pressure or remove an official
+- Pass local policy
+- Stop harmful project
+- Obtain compensation
+- Protect public resource
+- Win election
+- Expose corruption
+- Defend civil rights
+- Improve infrastructure
+- Secure welfare benefit
+- Resolve policing issue
+- Reform institution
+
+14. INSTITUTION_TYPE
+--------------------
+- Municipal office
+- Land registry
+- Police department
+- Court
+- Ministry
+- Tax authority
+- Licensing office
+- Environmental agency
+- Election commission
+- School board
+- University
+- Public hospital
+- Welfare office
+- Transport authority
+- Utility company
+- Parliament
+- Local council
+- Anti-corruption agency
+- Ombudsman
+- Development authority
+
+15. STAKEHOLDER_ARCHETYPE
+-------------------------
+- Honest but overloaded official
+- Efficient reformer
+- Risk-averse bureaucrat
+- Corrupt gatekeeper
+- Political appointee
+- Local broker
+- Community elder
+- Opposition politician
+- Government politician
+- Journalist
+- Judge
+- Police officer
+- Union leader
+- Business lobby
+- Landowner
+- Developer
+- Activist network
+- Resident association
+- Anonymous whistleblower
+- Foreign investor
+
+Each stakeholder needs: interests, fears, incentives, loyalty, integrity, influence, responsiveness, and hidden agenda.
+
+16. ACTION_TYPE
+---------------
+- File application
+- Submit evidence
+- Visit office
+- Request information
+- File appeal
+- File court case
+- Contact elected representative
+- Contact media
+- Organize residents
+- Organize protest
+- Start petition
+- Hire lawyer
+- Hire broker
+- Seek expert report
+- Attend public hearing
+- Negotiate
+- Expose wrongdoing
+- Wait
+- Follow up
+- Escalate to higher authority
+- Offer informal payment
+- Refuse informal payment
+- Seek whistleblower support
+- Build coalition
+- Start fundraising
+- Use digital campaign
+- Conduct survey
+- Request audit
+- Contest election
+- Launch strike
+- Seek international attention
+
+Each action needs: cost, time, energy, legal risk, reputation effect, probability modifiers, preconditions, and side effects.
+
+17. PROCEDURAL_BARRIER
+----------------------
+- Missing document
+- Conflicting records
+- Jurisdiction dispute
+- Application backlog
+- Portal failure
+- Officer unavailable
+- Election-code restriction
+- Court stay
+- Budget freeze
+- Security clearance
+- Environmental approval
+- Land-title dispute
+- Procurement delay
+- Eligibility ambiguity
+- Policy change
+- Appeal deadline
+- Translation requirement
+- Identity-verification failure
+
+18. RANDOM_EVENT
+----------------
+- Election announced
+- Minister reshuffled
+- Officer transferred
+- Budget cut
+- Scandal breaks
+- Natural disaster
+- Protest turns violent
+- Court grants interim relief
+- Media story goes viral
+- Public support drops
+- Whistleblower appears
+- Key document leaks
+- Coalition collapses
+- Internet shutdown
+- Strike begins
+- New law passes
+- Audit announced
+- Counter-campaign begins
+- Police impose restrictions
+- International organization comments
+- Local leader defects
+- Evidence is challenged
+- Funding arrives
+- Inflation raises costs
+- Player faces family or health emergency
+
+19. PROTEST_MODEL
+-----------------
+Variables:
+- Crowd size
+- Volunteer capacity
+- Police tolerance
+- Legal permission
+- Public sympathy
+- Media coverage
+- Counter-protest risk
+- Violence risk
+- Fatigue
+- Leadership unity
+- Message clarity
+- Government sensitivity
+- Election proximity
+
+Possible outcomes:
+- Ignored
+- Negotiation offered
+- Partial concession
+- Police restrictions
+- Arrests
+- Government inquiry
+- Minister resignation
+- Movement fragmentation
+- Public backlash
+- Policy reversal
+
+20. BUSINESS_CREATION_MODEL
+---------------------------
+Stages:
+- Business plan
+- Financing
+- Company registration
+- Land search
+- Title verification
+- Zoning approval
+- Environmental approval
+- Construction permit
+- Utility connection
+- Tax registration
+- Labor compliance
+- Opening approval
+
+Complications:
+- Land dispute
+- Community opposition
+- Environmental objections
+- Bribe demand
+- Political favoritism
+- Financing collapse
+- Policy change
+- Infrastructure shortage
+
+21. LAND_ACQUISITION_MODEL
+--------------------------
+Variables:
+- Ownership clarity
+- Market price
+- Zoning
+- Environmental sensitivity
+- Community rights
+- Existing occupants
+- Political influence
+- Speculation
+- Compensation requirements
+- Court disputes
+- Infrastructure access
+
+Strategies:
+- Direct purchase
+- Public auction
+- Lease
+- Industrial-development allocation
+- Joint venture
+- Community negotiation
+- Relocation package
+- Court challenge
+
+22. PUBLIC_SERVICE_MODEL
+------------------------
+Applicable to drainage, roads, electricity, water, waste, street lighting, transport, internet, schools, and healthcare.
+
+Stages:
+- Complaint
+- Inspection
+- Technical approval
+- Budget allocation
+- Procurement
+- Construction
+- Completion
+- Maintenance
+
+23. EMPLOYMENT_AND_RECRUITMENT_MODEL
+-----------------------------------
+Applicable to police recruitment, teaching, civil service, public contracts, and university hiring.
+
+Stages:
+- Application
+- Eligibility check
+- Examination
+- Interview
+- Medical test
+- Background verification
+- Merit list
+- Appeal
+- Appointment
+
+Issues:
+- Exam leak
+- Reservation dispute
+- Wrong answer key
+- Recruitment cancellation
+- Nepotism
+- Delayed appointment
+- Court stay
+
+24. MINISTERIAL_ACCOUNTABILITY_MODEL
+------------------------------------
+Variables:
+- Severity of failure
+- Evidence strength
+- Public anger
+- Party discipline
+- Coalition stability
+- Media pressure
+- Opposition unity
+- Election proximity
+- Head-of-government support
+- Parliamentary inquiry
+- Court involvement
+
+Outcomes:
+- No action
+- Apology
+- Inquiry
+- Policy reversal
+- Suspension
+- Resignation
+- Cabinet reshuffle
+- Government collapse
+
+25. ELECTION_MODEL
+------------------
+Components:
+- Candidate selection
+- Campaign funding
+- Volunteers
+- Media messaging
+- Voter outreach
+- Debate
+- Polling
+- Election-day logistics
+- Counting
+- Legal challenge
+- Coalition formation
+
+Complications:
+- Misinformation
+- Vote-buying allegations
+- Low turnout
+- Violence
+- Recount
+- Disqualification
+- Coalition betrayal
+
+26. CORRUPTION_EXPOSURE_MODEL
+-----------------------------
+Stages:
+- Suspicion
+- Evidence gathering
+- Whistleblower contact
+- Verification
+- Publication
+- Official denial
+- Investigation
+- Retaliation
+- Prosecution
+- Institutional reform
+
+Risks:
+- Defamation suit
+- Threats
+- Fabricated evidence
+- Source withdrawal
+- Media capture
+- Political interference
+
+27. RIGHTS_AND_FREEDOMS_MODEL
+----------------------------
+Applicable to speech, assembly, privacy, minority rights, labor rights, digital rights, and press freedom.
+
+Actions:
+- Legal challenge
+- Public campaign
+- Coalition building
+- Documentation
+- International advocacy
+- Legislative lobbying
+- Peaceful protest
+
+28. PUBLIC_BUDGET_MODEL
+----------------------
+Stages:
+- Proposal
+- Committee review
+- Public consultation
+- Allocation
+- Tender
+- Execution
+- Audit
+
+Conflicts:
+- Competing priorities
+- Fiscal deficit
+- Political favoritism
+- Cost overruns
+- Emergency reallocation
+- Corruption
+
+29. ENVIRONMENTAL_CONFLICT_MODEL
+-------------------------------
+Applicable to pollution, mining, deforestation, dams, waste disposal, coastal development, and air quality.
+
+Stakeholders:
+- Residents
+- Company
+- Environmental agency
+- Courts
+- Scientists
+- Workers
+- Politicians
+- Investors
+
+Outcomes:
+- Permit approved
+- Conditional approval
+- Project stopped
+- Compensation
+- Relocation
+- Cleanup order
+- Long litigation
+
+30. PUBLIC_HEALTH_MODEL
+----------------------
+Applicable to hospital closure, medicine shortage, epidemics, unsafe water, pollution illness, and vaccination.
+
+Variables:
+- Urgency
+- Evidence
+- Capacity
+- Public trust
+- Misinformation
+- Funding
+- Expert support
+
+31. EDUCATION_SYSTEM_MODEL
+-------------------------
+Applicable to school infrastructure, teacher shortages, admissions, examination scandal, curriculum disputes, ministerial accountability, and scholarships.
+
+Actors:
+- Students
+- Parents
+- Teachers
+- Universities
+- Ministry
+- Courts
+- Unions
+- Media
+
+32. POLICING_AND_JUSTICE_MODEL
+-----------------------------
+Applicable to police complaints, wrongful arrest, missing investigation, recruitment, public-order restrictions, and custodial misconduct.
+
+Stages:
+- Complaint
+- Internal inquiry
+- Evidence review
+- Prosecutor decision
+- Court process
+- Compensation
+- Reform
+
+33. DISASTER_RESPONSE_MODEL
+---------------------------
+Applicable to floods, earthquakes, fires, cyclones, drought, and industrial accidents.
+
+Objectives:
+- Obtain relief
+- Restore services
+- Demand accountability
+- Secure compensation
+- Prevent relief corruption
+
+34. INFORMATION_AND_DISINFORMATION_MODEL
+----------------------------------------
+Variables:
+- Evidence quality
+- Source credibility
+- Bot amplification
+- Media polarization
+- Fact-checking capacity
+- Public trust
+- Government transparency
+
+Outcomes:
+- Truth accepted
+- Confusion persists
+- False narrative dominates
+- Inquiry launched
+- Polarization increases
+
+35. COALITION_BUILDING_MODEL
+----------------------------
+Actors:
+- Residents
+- Students
+- Workers
+- Businesses
+- NGOs
+- Opposition parties
+- Government reformers
+- Experts
+- Media
+
+Variables:
+- Shared objective
+- Ideological distance
+- Trust
+- Leadership
+- Resource contribution
+- Risk tolerance
+- Internal conflict
+
+36. CONSEQUENCE_AND_MEMORY_MODEL
+-------------------------------
+The simulation must remember prior choices.
+
+Examples:
+- Paying a bribe creates future expectations.
+- Peaceful protest can increase credibility.
+- Misinformation reduces trust later.
+- Winning a court case strengthens future legal actions.
+- Betraying a coalition reduces cooperation.
+- Supporting one faction may close access to another.
+
+SCENARIO SEED LIBRARY
+=====================
+
+01. Repair a blocked drainage system
+Get inspection, budget approval, procurement, and repair completed.
+
+02. Demand resignation of an education minister
+Build pressure after an examination scandal or major policy failure.
+
+03. Acquire land for a new business
+Find land, verify title, secure zoning and environmental approval, and avoid disputes.
+
+04. Start a small restaurant
+Obtain company registration, food licence, fire clearance, tax registration, and utilities.
+
+05. Correct a birth-certificate error
+Fix an official record before a school or passport deadline.
+
+06. Obtain a police-constable job
+Complete recruitment despite delays, examination disputes, and favoritism.
+
+07. Stop closure of a public school
+Mobilize parents, gather evidence, negotiate, and challenge the decision.
+
+08. Demand clean drinking water
+Prove contamination, secure emergency supply, and obtain long-term repair.
+
+09. Challenge an incorrect tax penalty
+Gather records, appeal, and stop enforcement before the deadline.
+
+10. Prevent demolition of a neighborhood
+Verify land rights, organize residents, seek court relief, and negotiate redevelopment.
+
+11. Expose municipal procurement corruption
+Collect evidence, protect sources, involve media, and trigger investigation.
+
+12. Win compensation after flooding
+Prove damage and government responsibility while navigating relief bureaucracy.
+
+13. Oppose a polluting factory
+Gather scientific evidence, mobilize residents, and challenge permits.
+
+14. Obtain a disability benefit
+Complete medical certification, eligibility verification, and appeals.
+
+15. Get a public hospital reopened
+Build a coalition of patients, doctors, media, and local politicians.
+
+16. Demand action after police misconduct
+Secure investigation, protect witnesses, and pursue disciplinary or judicial remedies.
+
+17. Organize a lawful national protest
+Build a coalition, obtain permissions, manage messaging, and avoid escalation.
+
+18. Contest a disputed local election
+Gather polling evidence, request recount, and pursue legal remedies.
+
+19. Protect a public park from commercial development
+Challenge zoning, mobilize residents, and propose alternatives.
+
+20. Obtain a university scholarship
+Correct records, meet deadlines, appeal rejection, and prove eligibility.
+
+21. Secure a rural electricity connection
+Navigate utility approval, local politics, budget constraints, and installation.
+
+22. Improve dangerous public transport
+Document accidents, organize commuters, and pressure the transport authority.
+
+23. Stop an internet shutdown
+Challenge legality and build business and civil-society support.
+
+24. Obtain compensation for wrongful arrest
+Prove misconduct, find legal support, and survive a long court process.
+
+25. Reform a corrupt licensing office
+Document patterns, secure audit, and press for digitization.
+
+26. Save a local newspaper from political pressure
+Build subscriber support, legal defense, and public visibility.
+
+27. Establish a community health clinic
+Acquire premises, permits, funding, and staff.
+
+28. Fight a discriminatory housing policy
+Collect cases, organize affected groups, and pursue legal and political remedies.
+
+29. Demand transparency in a public budget
+Obtain records, analyze spending, and force public review.
+
+30. Prevent cancellation of a government recruitment process
+Organize candidates, challenge irregularities, and obtain a fair revised process.
+
+31. Secure fair compensation for land acquisition
+Verify valuation, unite landowners, negotiate, and challenge inadequate offers.
+
+32. Remove a dangerous illegal structure
+Prove risk, overcome political protection, and obtain enforcement.
+
+33. Establish a workers' union
+Recruit members, register the union, survive resistance, and negotiate.
+
+34. Oppose a controversial curriculum change
+Build evidence, organize parents and teachers, and influence policy review.
+
+35. Demand action on a missing-person investigation
+Keep the case active, secure media coverage, and overcome institutional delay.
+
+36. Start a technology company in a regulated sector
+Obtain financing, licences, data approvals, premises, and public trust.
+
+37. Rebuild after an earthquake
+Secure relief, prevent corruption, restore utilities, and coordinate reconstruction.
+
+38. Challenge censorship of a documentary
+Use legal, media, cultural, and public-pressure routes.
+
+39. Protect election workers from intimidation
+Document threats, obtain security, and preserve election integrity.
+
+40. Pass a city-level climate adaptation plan
+Build a coalition, secure funding, overcome opposition, and obtain council approval.
+
+ENVIRONMENT MODIFIERS
+=====================
+
+Randomly apply 1–4 modifiers:
+- Election in 30 days
+- Government has a one-seat majority
+- Mayor is highly popular
+- Minister is politically weak
+- Courts are on strike
+- Public trust is low
+- Social media is highly influential
+- Media is polarized
+- Inflation is high
+- Severe rainfall is expected
+- Player has a family emergency
+- Opposition parties are divided
+- A whistleblower is available
+- A major company supports the government
+- International attention is rising
+- A new anti-corruption law was passed
+- Internet access is unreliable
+- Administrative language differs from local language
+- Government portal is malfunctioning
+- City budget is nearly exhausted
+- Natural disaster changes priorities
+- Leaked document changes opinion
+- Police impose assembly restrictions
+- Public support starts high
+- Public support starts hostile
+
+GENERATION RULES
+================
+
+Generate each environment by selecting:
+- 1 WORLD_REGION
+- 1 GOVERNMENT_LEVEL
+- 1 POLITICAL_SYSTEM
+- 1 ADMINISTRATIVE_CAPACITY
+- 1 CORRUPTION_STRUCTURE
+- 1 RULE_OF_LAW
+- 1 MEDIA_ENVIRONMENT
+- 1 ECONOMIC_CONDITION
+- 1 PLAYER_ROLE
+- 1 CIVIC_OBJECTIVE_TYPE
+- 2–6 institutions
+- 3–8 stakeholders
+- 6–15 actions
+- 2–6 procedural barriers
+- 3–10 random events
+- 1–4 environment modifiers
+
+Validate combinations for coherence.
+
+Examples:
+- A village drainage mission should not immediately require a constitutional court.
+- A minister-resignation mission should include media, parliament, party leadership, and protest mechanics.
+- A business-land mission should include registry, zoning, financing, and community interests.
+- A rights case should include legal standing, evidence, public support, and court access.
+
+THREE STARTER ENVIRONMENTS
+==========================
+
+A. THE FLOODED WARD
+-------------------
+World: South Asian megacity
+Player: Small business owner
+Objective: Repair blocked drainage before monsoon
+Institutions: Municipality, ward office, public works department, local court
+Stakeholders: Engineer, councillor, residents, contractor, journalist
+Hidden variables: Contractor influence, budget, election sensitivity, rain probability
+Endings: Full repair, temporary cleanup, delayed budget, court order, resource exhaustion, flood before completion
+
+B. THE EXAMINATION SCANDAL
+--------------------------
+World: Federal parliamentary democracy
+Player: Student organizer
+Objective: Force education-minister accountability after a nationwide examination leak
+Institutions: Education ministry, parliament, court, election commission, police
+Stakeholders: Minister, head of government, opposition, student unions, teachers, journalists, police
+Systems: Protest, ministerial accountability, media, coalition building, disinformation
+Endings: Resignation, inquiry, exam repeated, movement collapses, crackdown, government instability
+
+C. FACTORY GROUND
+-----------------
+World: West African capital
+Player: Entrepreneur
+Objective: Acquire land and open a food-processing factory
+Institutions: Land registry, municipality, environmental agency, utility, tax office
+Stakeholders: Landowners, community leader, bank, broker, environmental official
+Systems: Business creation, land acquisition, community negotiation, environmental approval
+Endings: Factory opens, land dispute blocks project, community partnership, permit denied, finance collapse, relocation
+
+IMPLEMENTATION CUE FOR CODEX
+============================
+
+1. Keep scenarios data-driven.
+2. Store abstractions separately from scenario instances.
+3. Use JSON or YAML plus strongly typed validation.
+4. Do not embed political assumptions in rendering code.
+5. Let players select region, political environment, role, category, and difficulty.
+6. Include a random-world option.
+7. Generate visuals from theme packs.
+8. Keep probabilities and hidden variables server-side.
+9. Preserve game history across missions.
+10. Let earlier choices affect later scenarios.
+11. Add a scenario validator.
+12. Add a balancing/Monte Carlo tool.
+13. Implement three complete starter environments first.
+14. Add future scenarios through data packs without engine changes.
+15. Reuse the same event, resource, persistence, animation, and UI systems.
+
+SUGGESTED DATA SHAPE
+====================
+
+environment:
+  id: string
+  title: string
+  world_region: string
+  government_level: string
+  political_system: string
+  administrative_capacity: string
+  corruption_structure: string
+  rule_of_law: string
+  media_environment: string
+  economic_condition: string
+  inequality_level: string
+  visual_theme: string
+
+player:
+  role: string
+  profile_id: string
+  resources: map
+  skills: map
+  relationships: map
+
+scenario:
+  objective_type: string
+  objective_text: string
+  institutions: list
+  stakeholders: list
+  actions: list
+  barriers: list
+  random_events: list
+  success_conditions: list
+  failure_conditions: list
+  possible_endings: list
+
+simulation:
+  hidden_variables: map
+  current_state: map
+  history: list
+  random_seed: string
+  scenario_version: string
+  engine_version: string
+
+FINAL DEVELOPMENT GOAL
+======================
+
+Build Democracy Simulator as a reusable world-scale civic simulation platform.
+
+Players must be able to select or generate different countries, cities, political systems, civic problems, roles, institutions, and difficulty levels. The engine should combine reusable abstractions to create distinct environments rather than hard-coding individual missions.
+
+The first release should contain three complete playable environments:
+1. Neighborhood drainage repair
+2. Education-minister resignation campaign
+3. Land acquisition for a new business
+
+All three must share the same engine, event system, resource model, persistence, visual framework, and scenario-generation architecture.

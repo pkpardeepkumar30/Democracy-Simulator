@@ -10,8 +10,13 @@ services:
     environment:
       PORT: "8080"
       RUST_LOG: "civic_sim_server=info,tower_http=info"
+      GAME_PACKS_PATH: "/app/game-packs"
+      DEFAULT_GAME_PACK_ID: "civic-drainage-v1"
       GAME_PACK_PATH: "/app/game-packs/drainage/game.json"
+      ABSTRACTION_CATALOG_PATH: "/app/game-packs/abstractions.json"
       SESSION_STORE_PATH: "/data/sessions.json"
+      GENERATED_PACK_STORE_PATH: "/data/generated-packs.json"
+      CAMPAIGN_STORE_PATH: "/data/campaigns.json"
     volumes:
       - civic_game_data:/data
     restart: unless-stopped

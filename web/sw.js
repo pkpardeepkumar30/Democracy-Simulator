@@ -1,5 +1,5 @@
-const CACHE = 'civic-sim-shell-v1';
-const SHELL = ['/', '/styles.css', '/app.js', '/manifest.webmanifest'];
+const CACHE = 'democracy-simulator-shell-v5';
+const SHELL = ['/', '/styles.css', '/city.bundle.js', '/app.js', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));
