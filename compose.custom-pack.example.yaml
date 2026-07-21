@@ -1,0 +1,9 @@
+# Usage:
+# docker compose -f compose.yaml -f compose.custom-pack.example.yaml up --build
+services:
+  game:
+    environment:
+      GAME_PACK_PATH: /custom-game/game.json
+    volumes:
+      - ./my-new-game-pack:/custom-game:ro
+      - civic_game_data:/data

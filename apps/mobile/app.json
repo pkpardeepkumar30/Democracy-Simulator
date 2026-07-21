@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "The Republic",
+    "slug": "the-republic-civic-game",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "civicsim",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "plugins": ["expo-router"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.example.civicsim"
+    },
+    "android": {
+      "package": "com.example.civicsim",
+      "adaptiveIcon": {
+        "backgroundColor": "#172c3f"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

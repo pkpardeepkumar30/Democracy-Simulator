@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#172c3f" />
+  <meta name="description" content="A stochastic civic-strategy game about navigating public administration." />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="stylesheet" href="/styles.css" />
+  <title>The Republic — Civic Strategy Game</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">CIVIC SIMULATION</p>
+        <h1>The Republic</h1>
+      </div>
+      <div class="topbar-actions">
+        <span id="connectionBadge" class="status-badge">Connecting…</span>
+        <button id="newGameButton" class="button button-secondary" type="button" hidden>New game</button>
+      </div>
+    </header>
+
+    <main id="app" aria-live="polite">
+      <section class="loading-panel">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Loading the civic simulation…</p>
+      </section>
+    </main>
+
+    <footer>
+      <span>Seeded stochastic simulation</span>
+      <span>•</span>
+      <span>Game state persists on the server</span>
+    </footer>
+  </div>
+
+  <dialog id="resultDialog" class="result-dialog">
+    <div class="dialog-content">
+      <p id="dialogLabel" class="eyebrow">OUTCOME</p>
+      <h2 id="dialogTitle">Result</h2>
+      <p id="dialogMessage"></p>
+      <div id="dialogDelta" class="delta-line"></div>
+      <button id="dialogClose" class="button button-primary" type="button">Continue</button>
+    </div>
+  </dialog>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>

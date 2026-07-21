@@ -1,0 +1,441 @@
+{
+  "id": "civic-drainage-v1",
+  "title": "The Republic: Drainage Mission",
+  "description": "A stochastic civic-strategy scenario about getting a neglected neighbourhood drainage system repaired before time, money and energy run out.",
+  "version": "1.0.0",
+  "mission": {
+    "title": "Repair the neighbourhood drainage",
+    "objective": "Get the municipal drainage repair completed and verified before the monsoon deadline.",
+    "starting_status": "Residents have complained informally, but no official case exists.",
+    "win_progress": 100
+  },
+  "citizens": [
+    {
+      "id": "shopkeeper",
+      "name": "Ramesh Kumar",
+      "occupation": "Small shop owner",
+      "context": "Ramesh loses income whenever he closes his shop to visit an office, but he knows many residents and local traders.",
+      "starting_resources": {
+        "money": 25000,
+        "energy": 76,
+        "influence": 12,
+        "days_remaining": 180
+      },
+      "starting_metrics": {
+        "progress": 0,
+        "documentation": 5,
+        "community_support": 18,
+        "public_attention": 0,
+        "integrity": 100
+      },
+      "modifiers": {
+        "community": 1.15
+      }
+    },
+    {
+      "id": "teacher",
+      "name": "Meera Sharma",
+      "occupation": "Government-school teacher",
+      "context": "Meera understands written procedures and can prepare a strong record, but public campaigning may create professional pressure.",
+      "starting_resources": {
+        "money": 18500,
+        "energy": 82,
+        "influence": 16,
+        "days_remaining": 180
+      },
+      "starting_metrics": {
+        "progress": 0,
+        "documentation": 18,
+        "community_support": 10,
+        "public_attention": 0,
+        "integrity": 100
+      },
+      "modifiers": {
+        "documentation": 1.2
+      }
+    },
+    {
+      "id": "daily_wage_worker",
+      "name": "Salim Ansari",
+      "occupation": "Daily-wage worker",
+      "context": "Salim is directly affected by stagnant sewage and has strong motivation, but every office visit costs a day of income.",
+      "starting_resources": {
+        "money": 9000,
+        "energy": 90,
+        "influence": 5,
+        "days_remaining": 180
+      },
+      "starting_metrics": {
+        "progress": 0,
+        "documentation": 2,
+        "community_support": 25,
+        "public_attention": 0,
+        "integrity": 100
+      },
+      "modifiers": {
+        "energy": 1.15
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "file_complaint",
+      "title": "File a formal complaint",
+      "description": "Submit the first written complaint with photographs and receive a tracking number.",
+      "cost": { "money": 250, "energy": 3, "influence": 0, "days": 3 },
+      "guaranteed_effect": {
+        "documentation": 8,
+        "progress": 3
+      },
+      "requirements": [],
+      "outcomes": [
+        {
+          "id": "registered",
+          "message": "The complaint is registered and forwarded to the engineering section.",
+          "base_weight": 42,
+          "progress_min": 7,
+          "progress_max": 12,
+          "effect": {},
+          "conditions": [
+            { "metric": "documentation", "min": 15, "multiplier": 1.35 },
+            { "metric": "departmental_backlog", "max": 55, "multiplier": 1.25 }
+          ]
+        },
+        {
+          "id": "missing_details",
+          "message": "The clerk asks for a ward number, ownership details and clearer photographs.",
+          "base_weight": 30,
+          "progress_min": 0,
+          "progress_max": 3,
+          "effect": { "documentation": 3, "resources": { "days_remaining": -2 } },
+          "conditions": [
+            { "metric": "documentation", "max": 14, "multiplier": 1.7 }
+          ]
+        },
+        {
+          "id": "silent_transfer",
+          "message": "The file is transferred internally, but nobody accepts responsibility for the next step.",
+          "base_weight": 28,
+          "progress_min": 1,
+          "progress_max": 5,
+          "effect": { "resources": { "energy": -2, "days_remaining": -4 } },
+          "conditions": [
+            { "metric": "departmental_backlog", "min": 65, "multiplier": 1.8 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "visit_office",
+      "title": "Visit the municipal office",
+      "description": "Spend a day following the file through the clerical and engineering desks.",
+      "cost": { "money": 650, "energy": 7, "influence": 0, "days": 5 },
+      "guaranteed_effect": { "documentation": 2 },
+      "requirements": [
+        { "metric": "progress", "min": 3, "message": "File a formal complaint first." }
+      ],
+      "outcomes": [
+        {
+          "id": "officer_meeting",
+          "message": "You meet the junior engineer, who records the site for inspection.",
+          "base_weight": 34,
+          "progress_min": 10,
+          "progress_max": 18,
+          "effect": {},
+          "conditions": [
+            { "metric": "officer_integrity", "min": 55, "multiplier": 1.4 },
+            { "metric": "documentation", "min": 25, "multiplier": 1.25 }
+          ]
+        },
+        {
+          "id": "officer_absent",
+          "message": "The responsible officer is absent and the visit produces no decision.",
+          "base_weight": 38,
+          "progress_min": 0,
+          "progress_max": 2,
+          "effect": { "resources": { "energy": -2, "days_remaining": -2 } },
+          "conditions": [
+            { "metric": "departmental_backlog", "min": 60, "multiplier": 1.45 }
+          ]
+        },
+        {
+          "id": "inspection_promised",
+          "message": "A site inspection is promised, but no date is committed in writing.",
+          "base_weight": 28,
+          "progress_min": 5,
+          "progress_max": 10,
+          "effect": { "documentation": 2 },
+          "conditions": []
+        }
+      ]
+    },
+    {
+      "id": "collect_signatures",
+      "title": "Mobilise the neighbourhood",
+      "description": "Collect signatures, photographs and short resident statements.",
+      "cost": { "money": 500, "energy": 8, "influence": 0, "days": 7 },
+      "guaranteed_effect": {
+        "community_support": 18,
+        "documentation": 7,
+        "public_attention": 3
+      },
+      "requirements": [],
+      "outcomes": [
+        {
+          "id": "strong_turnout",
+          "message": "Residents participate actively and the complaint gains collective legitimacy.",
+          "base_weight": 55,
+          "progress_min": 5,
+          "progress_max": 10,
+          "effect": { "community_support": 10 },
+          "conditions": [
+            { "metric": "community_support", "min": 25, "multiplier": 1.3 }
+          ]
+        },
+        {
+          "id": "fear_of_retaliation",
+          "message": "Several residents refuse to sign because they fear conflict with local officials.",
+          "base_weight": 28,
+          "progress_min": 1,
+          "progress_max": 4,
+          "effect": { "community_support": -4, "resources": { "energy": -3 } },
+          "conditions": []
+        },
+        {
+          "id": "resident_committee",
+          "message": "A resident committee forms and agrees to share follow-up work.",
+          "base_weight": 17,
+          "progress_min": 8,
+          "progress_max": 14,
+          "effect": { "resources": { "energy": 5, "influence": 4 } },
+          "conditions": [
+            { "metric": "community_support", "min": 45, "multiplier": 1.8 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "file_rti",
+      "title": "File an information request",
+      "description": "Request the file status, responsible officer, budget head and inspection notes.",
+      "cost": { "money": 350, "energy": 5, "influence": 0, "days": 12 },
+      "guaranteed_effect": { "documentation": 12 },
+      "requirements": [
+        { "metric": "progress", "min": 8, "message": "A traceable complaint should exist before requesting its records." }
+      ],
+      "outcomes": [
+        {
+          "id": "useful_disclosure",
+          "message": "The response identifies the responsible engineer and exposes an overdue inspection.",
+          "base_weight": 38,
+          "progress_min": 12,
+          "progress_max": 20,
+          "effect": { "public_attention": 4 },
+          "conditions": [
+            { "metric": "documentation", "min": 25, "multiplier": 1.45 },
+            { "metric": "officer_integrity", "min": 50, "multiplier": 1.2 }
+          ]
+        },
+        {
+          "id": "vague_reply",
+          "message": "The department sends a procedural reply that reveals little beyond the file number.",
+          "base_weight": 42,
+          "progress_min": 3,
+          "progress_max": 8,
+          "effect": {},
+          "conditions": [
+            { "metric": "departmental_backlog", "min": 60, "multiplier": 1.3 }
+          ]
+        },
+        {
+          "id": "no_reply",
+          "message": "No response arrives within the expected period; an appeal is now possible.",
+          "base_weight": 20,
+          "progress_min": 0,
+          "progress_max": 3,
+          "effect": { "resources": { "energy": -3, "days_remaining": -10 } },
+          "conditions": []
+        }
+      ]
+    },
+    {
+      "id": "contact_councillor",
+      "title": "Approach the ward councillor",
+      "description": "Ask the elected representative to push the department and arrange an inspection.",
+      "cost": { "money": 900, "energy": 5, "influence": 8, "days": 5 },
+      "guaranteed_effect": { "public_attention": 5 },
+      "requirements": [
+        { "metric": "community_support", "min": 25, "message": "Build visible neighbourhood support first." }
+      ],
+      "outcomes": [
+        {
+          "id": "political_push",
+          "message": "The councillor calls the municipal office and secures a dated inspection order.",
+          "base_weight": 35,
+          "progress_min": 16,
+          "progress_max": 26,
+          "effect": {},
+          "conditions": [
+            { "metric": "election_pressure", "min": 55, "multiplier": 1.8 },
+            { "metric": "community_support", "min": 50, "multiplier": 1.35 }
+          ]
+        },
+        {
+          "id": "symbolic_support",
+          "message": "The councillor expresses support publicly but makes no binding commitment.",
+          "base_weight": 45,
+          "progress_min": 4,
+          "progress_max": 10,
+          "effect": { "public_attention": 5 },
+          "conditions": []
+        },
+        {
+          "id": "political_condition",
+          "message": "Support is offered only if residents attend a political event, creating internal disagreement.",
+          "base_weight": 20,
+          "progress_min": 2,
+          "progress_max": 7,
+          "effect": { "community_support": -7, "integrity": -4 },
+          "conditions": [
+            { "metric": "election_pressure", "min": 60, "multiplier": 1.25 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "media_campaign",
+      "title": "Escalate through local media",
+      "description": "Give documented evidence to a local reporter and publish the resident timeline.",
+      "cost": { "money": 1400, "energy": 10, "influence": 3, "days": 6 },
+      "guaranteed_effect": { "public_attention": 22 },
+      "requirements": [
+        { "metric": "documentation", "min": 25, "message": "Gather stronger documentary evidence before contacting media." },
+        { "metric": "community_support", "min": 30, "message": "The story needs credible resident support." }
+      ],
+      "outcomes": [
+        {
+          "id": "coverage",
+          "message": "The story is published with photographs and officials announce an urgent inspection.",
+          "base_weight": 38,
+          "progress_min": 18,
+          "progress_max": 30,
+          "effect": {},
+          "conditions": [
+            { "metric": "documentation", "min": 45, "multiplier": 1.45 },
+            { "metric": "public_attention", "min": 30, "multiplier": 1.25 }
+          ]
+        },
+        {
+          "id": "limited_interest",
+          "message": "The reporter mentions the issue briefly, but it does not generate sustained pressure.",
+          "base_weight": 40,
+          "progress_min": 5,
+          "progress_max": 12,
+          "effect": {},
+          "conditions": []
+        },
+        {
+          "id": "official_pushback",
+          "message": "Officials dispute the account and relations with the local office become more difficult.",
+          "base_weight": 22,
+          "progress_min": 0,
+          "progress_max": 6,
+          "effect": { "resources": { "energy": -5, "influence": -2 } },
+          "conditions": [
+            { "metric": "officer_integrity", "max": 40, "multiplier": 1.6 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "court_case",
+      "title": "File a public-interest petition",
+      "description": "Engage a lawyer and ask the court for a time-bound municipal response.",
+      "cost": { "money": 8500, "energy": 15, "influence": 0, "days": 28 },
+      "guaranteed_effect": { "public_attention": 12, "documentation": 10 },
+      "requirements": [
+        { "metric": "documentation", "min": 45, "message": "A court filing needs a stronger documentary record." },
+        { "metric": "progress", "min": 20, "message": "Demonstrate that administrative remedies were attempted first." }
+      ],
+      "outcomes": [
+        {
+          "id": "notice_issued",
+          "message": "The court issues notice and requires the municipality to submit a time-bound action report.",
+          "base_weight": 45,
+          "progress_min": 28,
+          "progress_max": 42,
+          "effect": {},
+          "conditions": [
+            { "metric": "documentation", "min": 60, "multiplier": 1.55 }
+          ]
+        },
+        {
+          "id": "adjournment",
+          "message": "The matter is admitted but adjourned; legal pressure exists, yet the deadline keeps approaching.",
+          "base_weight": 38,
+          "progress_min": 10,
+          "progress_max": 18,
+          "effect": { "resources": { "days_remaining": -18, "energy": -4 } },
+          "conditions": []
+        },
+        {
+          "id": "technical_dismissal",
+          "message": "The petition is dismissed on a technical ground with liberty to pursue another remedy.",
+          "base_weight": 17,
+          "progress_min": 0,
+          "progress_max": 5,
+          "effect": { "resources": { "money": -2500, "energy": -8 } },
+          "conditions": [
+            { "metric": "documentation", "max": 54, "multiplier": 1.7 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "informal_payment",
+      "title": "Make an informal payment",
+      "description": "Take a costly illegal shortcut. It may accelerate the file, create further demands or trigger consequences.",
+      "cost": { "money": 4500, "energy": 6, "influence": 0, "days": 2 },
+      "guaranteed_effect": { "integrity": -22 },
+      "requirements": [
+        { "metric": "progress", "min": 5, "message": "There is not yet a traceable file to influence." }
+      ],
+      "outcomes": [
+        {
+          "id": "accelerated",
+          "message": "The file moves rapidly and a work order is prepared, but the transaction remains a future liability.",
+          "base_weight": 34,
+          "progress_min": 20,
+          "progress_max": 36,
+          "effect": { "resources": { "influence": -2 } },
+          "conditions": [
+            { "metric": "corruption_pressure", "min": 55, "multiplier": 1.8 },
+            { "metric": "officer_integrity", "max": 45, "multiplier": 1.45 }
+          ]
+        },
+        {
+          "id": "new_demand",
+          "message": "The intermediary demands more money and provides no verifiable progress.",
+          "base_weight": 43,
+          "progress_min": 0,
+          "progress_max": 6,
+          "effect": { "resources": { "money": -2500, "energy": -5 } },
+          "conditions": [
+            { "metric": "corruption_pressure", "min": 60, "multiplier": 1.25 }
+          ]
+        },
+        {
+          "id": "reported",
+          "message": "The approach reaches an honest officer; the citizen withdraws and becomes vulnerable to scrutiny.",
+          "base_weight": 23,
+          "progress_min": 0,
+          "progress_max": 3,
+          "effect": { "resources": { "influence": -6, "days_remaining": -8 }, "integrity": -8 },
+          "conditions": [
+            { "metric": "officer_integrity", "min": 65, "multiplier": 2.0 }
+          ]
+        }
+      ]
+    }
+  ]
+}

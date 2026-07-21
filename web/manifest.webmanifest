@@ -1,0 +1,10 @@
+{
+  "name": "The Republic — Civic Strategy Game",
+  "short_name": "The Republic",
+  "description": "A stochastic civic-strategy game about navigating public administration.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f1e9",
+  "theme_color": "#172c3f",
+  "icons": []
+}

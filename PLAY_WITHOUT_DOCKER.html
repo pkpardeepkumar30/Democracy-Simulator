@@ -1,0 +1,1304 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#172c3f" />
+  <meta name="description" content="A stochastic civic-strategy game about navigating public administration." />
+  <title>The Republic — Civic Strategy Game</title>
+<style>
+:root {
+  color-scheme: light;
+  --ink: #17212b;
+  --muted: #5f6c77;
+  --paper: #f4f1e9;
+  --surface: #fffdf8;
+  --surface-strong: #ffffff;
+  --line: #d9d4c8;
+  --navy: #172c3f;
+  --navy-soft: #e5ebef;
+  --saffron: #bb6b22;
+  --saffron-soft: #f6e9da;
+  --green: #326b51;
+  --green-soft: #e1eee7;
+  --red: #9b3c35;
+  --red-soft: #f4e2df;
+  --shadow: 0 14px 40px rgba(23, 44, 63, 0.08);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { min-height: 100%; background: var(--paper); }
+
+body {
+  margin: 0;
+  min-height: 100%;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(187, 107, 34, 0.09), transparent 28rem),
+    var(--paper);
+}
+
+button, input, select { font: inherit; }
+button { touch-action: manipulation; }
+
+.app-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: max(18px, env(safe-area-inset-top)) 0 max(24px, env(safe-area-inset-bottom));
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 10px 2px 24px;
+}
+
+.topbar h1 { margin: 1px 0 0; font-family: Georgia, serif; font-size: clamp(2rem, 5vw, 3rem); letter-spacing: -0.04em; }
+.eyebrow { margin: 0; color: var(--saffron); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.14em; }
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+.status-badge { padding: 7px 10px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,.72); color: var(--muted); font-size: .78rem; }
+.status-badge.online { color: var(--green); border-color: #aac8b8; background: var(--green-soft); }
+.status-badge.offline { color: var(--red); border-color: #d7aaa6; background: var(--red-soft); }
+
+.loading-panel, .empty-panel {
+  min-height: 420px;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.spinner { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--saffron); animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.hero-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: clamp(24px, 5vw, 54px);
+}
+.hero-card::after {
+  content: "";
+  position: absolute;
+  right: -90px;
+  top: -110px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  border: 48px solid rgba(187, 107, 34, .08);
+  pointer-events: none;
+}
+.hero-card h2 { position: relative; margin: 7px 0 12px; max-width: 780px; font: 700 clamp(2rem, 6vw, 4.6rem)/.98 Georgia, serif; letter-spacing: -.05em; }
+.hero-card .lead { position: relative; max-width: 720px; color: var(--muted); font-size: clamp(1rem, 2vw, 1.18rem); line-height: 1.65; }
+
+.profile-grid { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; margin-top: 32px; }
+.profile-card { display: flex; flex-direction: column; min-height: 260px; padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface-strong); }
+.profile-card h3 { margin: 12px 0 3px; font-size: 1.12rem; }
+.profile-card .occupation { color: var(--saffron); font-weight: 700; font-size: .88rem; }
+.profile-card p { color: var(--muted); line-height: 1.5; }
+.profile-card .resource-preview { display: flex; flex-wrap: wrap; gap: 6px; margin: auto 0 16px; }
+.chip { padding: 5px 8px; border-radius: 8px; background: var(--navy-soft); color: var(--navy); font-size: .75rem; font-weight: 700; }
+
+.button { min-height: 42px; border: 0; border-radius: 11px; padding: 10px 15px; font-weight: 800; cursor: pointer; transition: transform .12s ease, opacity .12s ease, background .12s ease; }
+.button:hover { transform: translateY(-1px); }
+.button:active { transform: translateY(0); }
+.button:disabled { cursor: not-allowed; opacity: .5; transform: none; }
+.button-primary { color: white; background: var(--navy); }
+.button-secondary { color: var(--navy); border: 1px solid var(--line); background: var(--surface); }
+.button-danger { color: var(--red); border: 1px solid #d7aaa6; background: var(--red-soft); }
+
+.game-layout { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .75fr); gap: 18px; align-items: start; }
+.main-column, .side-column { display: grid; gap: 18px; }
+.panel { border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: 0 8px 26px rgba(23, 44, 63, .05); }
+.panel-inner { padding: 22px; }
+
+.mission-panel { background: var(--navy); color: white; border-color: var(--navy); }
+.mission-panel .eyebrow { color: #f1bd82; }
+.mission-panel h2 { margin: 7px 0 8px; font: 700 clamp(1.7rem, 4vw, 2.7rem)/1.05 Georgia, serif; letter-spacing: -.03em; }
+.mission-panel p { color: #dce5eb; line-height: 1.55; }
+.citizen-strip { display: flex; justify-content: space-between; gap: 16px; align-items: end; margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.18); }
+.citizen-strip strong { display: block; }
+.citizen-strip span { color: #c3d1da; font-size: .83rem; }
+.turn-number { text-align: right; }
+.turn-number strong { font-size: 1.55rem; }
+
+.resource-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.metric-card { padding: 15px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface-strong); }
+.metric-card .label { color: var(--muted); font-size: .76rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.metric-card .value { margin-top: 4px; font-size: 1.35rem; font-weight: 850; }
+
+.progress-section { margin-top: 18px; }
+.progress-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: .9rem; font-weight: 800; }
+.progress-track { overflow: hidden; height: 12px; margin-top: 8px; border-radius: 999px; background: #e5e0d6; }
+.progress-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--saffron), #dd9b52); transition: width .5s ease; }
+.status-text { margin: 14px 0 0; padding: 13px 15px; border-left: 4px solid var(--saffron); background: var(--saffron-soft); line-height: 1.5; }
+
+.section-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.section-title h3 { margin: 0; font-size: 1.05rem; }
+.section-title span { color: var(--muted); font-size: .78rem; }
+.action-list { display: grid; gap: 10px; }
+.action-button { width: 100%; min-height: 92px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; text-align: left; padding: 15px 16px; border: 1px solid var(--line); border-radius: 14px; color: var(--ink); background: var(--surface-strong); cursor: pointer; }
+.action-button:hover:not(:disabled) { border-color: #af9c83; background: #fffaf2; }
+.action-button:disabled { cursor: not-allowed; opacity: .56; }
+.action-title { display: block; font-weight: 850; }
+.action-description { display: block; margin-top: 4px; color: var(--muted); font-size: .84rem; line-height: 1.4; }
+.action-cost { display: grid; gap: 4px; min-width: 104px; text-align: right; color: var(--muted); font-size: .75rem; }
+.action-cost strong { color: var(--navy); }
+.disabled-reason { grid-column: 1 / -1; color: var(--red); font-size: .76rem; }
+
+.secondary-metrics { display: grid; gap: 13px; }
+.stat-row { display: grid; gap: 6px; }
+.stat-header { display: flex; justify-content: space-between; gap: 10px; font-size: .82rem; }
+.mini-track { height: 8px; overflow: hidden; border-radius: 999px; background: #e6e1d7; }
+.mini-fill { height: 100%; background: var(--navy); border-radius: inherit; }
+
+.timeline { display: grid; gap: 14px; }
+.timeline-item { position: relative; padding-left: 22px; }
+.timeline-item::before { content: ""; position: absolute; left: 3px; top: 7px; width: 8px; height: 8px; border-radius: 50%; background: var(--saffron); }
+.timeline-item::after { content: ""; position: absolute; left: 6.5px; top: 19px; bottom: -16px; width: 1px; background: var(--line); }
+.timeline-item:last-child::after { display: none; }
+.timeline-item h4 { margin: 0 0 3px; font-size: .88rem; }
+.timeline-item p { margin: 0; color: var(--muted); font-size: .8rem; line-height: 1.45; }
+.event-meta { margin-top: 4px; color: var(--saffron); font-size: .73rem; font-weight: 750; }
+
+.end-banner { padding: 20px; border-radius: 18px; text-align: center; }
+.end-banner.won { border: 1px solid #aac8b8; background: var(--green-soft); }
+.end-banner.lost { border: 1px solid #d7aaa6; background: var(--red-soft); }
+.end-banner h3 { margin: 0 0 6px; font: 700 1.8rem Georgia, serif; }
+
+.result-dialog { width: min(500px, calc(100% - 28px)); border: 0; border-radius: 20px; padding: 0; background: var(--surface); box-shadow: 0 24px 70px rgba(0,0,0,.22); }
+.result-dialog::backdrop { background: rgba(17, 30, 41, .65); backdrop-filter: blur(3px); }
+.dialog-content { padding: 28px; }
+.dialog-content h2 { margin: 7px 0 10px; font: 700 2rem Georgia, serif; }
+.dialog-content p { color: var(--muted); line-height: 1.55; }
+.delta-line { margin: 16px 0 22px; padding: 12px; border-radius: 10px; background: var(--navy-soft); color: var(--navy); font-weight: 800; }
+
+footer { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; padding: 24px 0 0; color: var(--muted); font-size: .75rem; }
+
+@media (max-width: 900px) {
+  .game-layout { grid-template-columns: 1fr; }
+  .side-column { grid-template-columns: 1fr 1fr; }
+  .profile-grid { grid-template-columns: 1fr; }
+  .profile-card { min-height: auto; }
+}
+
+@media (max-width: 640px) {
+  .app-shell { width: min(100% - 20px, 1180px); }
+  .topbar { align-items: flex-start; }
+  .topbar-actions { flex-direction: column; align-items: flex-end; }
+  .status-badge { display: none; }
+  .hero-card { border-radius: 18px; padding: 24px 18px; }
+  .resource-grid { grid-template-columns: 1fr 1fr; }
+  .side-column { grid-template-columns: 1fr; }
+  .panel-inner { padding: 17px; }
+  .action-button { grid-template-columns: 1fr; gap: 8px; }
+  .action-cost { display: flex; flex-wrap: wrap; gap: 8px; text-align: left; }
+  .citizen-strip { align-items: flex-start; }
+}
+
+</style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">CIVIC SIMULATION</p>
+        <h1>The Republic</h1>
+      </div>
+      <div class="topbar-actions">
+        <span id="connectionBadge" class="status-badge">Connecting…</span>
+        <button id="newGameButton" class="button button-secondary" type="button" hidden>New game</button>
+      </div>
+    </header>
+
+    <main id="app" aria-live="polite">
+      <section class="loading-panel">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Loading the civic simulation…</p>
+      </section>
+    </main>
+
+    <footer>
+      <span>Seeded stochastic simulation</span>
+      <span>•</span>
+      <span>Game state persists on the server</span>
+    </footer>
+  </div>
+
+  <dialog id="resultDialog" class="result-dialog">
+    <div class="dialog-content">
+      <p id="dialogLabel" class="eyebrow">OUTCOME</p>
+      <h2 id="dialogTitle">Result</h2>
+      <p id="dialogMessage"></p>
+      <div id="dialogDelta" class="delta-line"></div>
+      <button id="dialogClose" class="button button-primary" type="button">Continue</button>
+    </div>
+  </dialog>
+
+<script type="application/json" id="embeddedGamePack">{
+  "id": "civic-drainage-v1",
+  "title": "The Republic: Drainage Mission",
+  "description": "A stochastic civic-strategy scenario about getting a neglected neighbourhood drainage system repaired before time, money and energy run out.",
+  "version": "1.0.0",
+  "mission": {
+    "title": "Repair the neighbourhood drainage",
+    "objective": "Get the municipal drainage repair completed and verified before the monsoon deadline.",
+    "starting_status": "Residents have complained informally, but no official case exists.",
+    "win_progress": 100
+  },
+  "citizens": [
+    {
+      "id": "shopkeeper",
+      "name": "Ramesh Kumar",
+      "occupation": "Small shop owner",
+      "context": "Ramesh loses income whenever he closes his shop to visit an office, but he knows many residents and local traders.",
+      "starting_resources": {
+        "money": 25000,
+        "energy": 76,
+        "influence": 12,
+        "days_remaining": 180
+      },
+      "starting_metrics": {
+        "progress": 0,
+        "documentation": 5,
+        "community_support": 18,
+        "public_attention": 0,
+        "integrity": 100
+      },
+      "modifiers": {
+        "community": 1.15
+      }
+    },
+    {
+      "id": "teacher",
+      "name": "Meera Sharma",
+      "occupation": "Government-school teacher",
+      "context": "Meera understands written procedures and can prepare a strong record, but public campaigning may create professional pressure.",
+      "starting_resources": {
+        "money": 18500,
+        "energy": 82,
+        "influence": 16,
+        "days_remaining": 180
+      },
+      "starting_metrics": {
+        "progress": 0,
+        "documentation": 18,
+        "community_support": 10,
+        "public_attention": 0,
+        "integrity": 100
+      },
+      "modifiers": {
+        "documentation": 1.2
+      }
+    },
+    {
+      "id": "daily_wage_worker",
+      "name": "Salim Ansari",
+      "occupation": "Daily-wage worker",
+      "context": "Salim is directly affected by stagnant sewage and has strong motivation, but every office visit costs a day of income.",
+      "starting_resources": {
+        "money": 9000,
+        "energy": 90,
+        "influence": 5,
+        "days_remaining": 180
+      },
+      "starting_metrics": {
+        "progress": 0,
+        "documentation": 2,
+        "community_support": 25,
+        "public_attention": 0,
+        "integrity": 100
+      },
+      "modifiers": {
+        "energy": 1.15
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "file_complaint",
+      "title": "File a formal complaint",
+      "description": "Submit the first written complaint with photographs and receive a tracking number.",
+      "cost": { "money": 250, "energy": 3, "influence": 0, "days": 3 },
+      "guaranteed_effect": {
+        "documentation": 8,
+        "progress": 3
+      },
+      "requirements": [],
+      "outcomes": [
+        {
+          "id": "registered",
+          "message": "The complaint is registered and forwarded to the engineering section.",
+          "base_weight": 42,
+          "progress_min": 7,
+          "progress_max": 12,
+          "effect": {},
+          "conditions": [
+            { "metric": "documentation", "min": 15, "multiplier": 1.35 },
+            { "metric": "departmental_backlog", "max": 55, "multiplier": 1.25 }
+          ]
+        },
+        {
+          "id": "missing_details",
+          "message": "The clerk asks for a ward number, ownership details and clearer photographs.",
+          "base_weight": 30,
+          "progress_min": 0,
+          "progress_max": 3,
+          "effect": { "documentation": 3, "resources": { "days_remaining": -2 } },
+          "conditions": [
+            { "metric": "documentation", "max": 14, "multiplier": 1.7 }
+          ]
+        },
+        {
+          "id": "silent_transfer",
+          "message": "The file is transferred internally, but nobody accepts responsibility for the next step.",
+          "base_weight": 28,
+          "progress_min": 1,
+          "progress_max": 5,
+          "effect": { "resources": { "energy": -2, "days_remaining": -4 } },
+          "conditions": [
+            { "metric": "departmental_backlog", "min": 65, "multiplier": 1.8 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "visit_office",
+      "title": "Visit the municipal office",
+      "description": "Spend a day following the file through the clerical and engineering desks.",
+      "cost": { "money": 650, "energy": 7, "influence": 0, "days": 5 },
+      "guaranteed_effect": { "documentation": 2 },
+      "requirements": [
+        { "metric": "progress", "min": 3, "message": "File a formal complaint first." }
+      ],
+      "outcomes": [
+        {
+          "id": "officer_meeting",
+          "message": "You meet the junior engineer, who records the site for inspection.",
+          "base_weight": 34,
+          "progress_min": 10,
+          "progress_max": 18,
+          "effect": {},
+          "conditions": [
+            { "metric": "officer_integrity", "min": 55, "multiplier": 1.4 },
+            { "metric": "documentation", "min": 25, "multiplier": 1.25 }
+          ]
+        },
+        {
+          "id": "officer_absent",
+          "message": "The responsible officer is absent and the visit produces no decision.",
+          "base_weight": 38,
+          "progress_min": 0,
+          "progress_max": 2,
+          "effect": { "resources": { "energy": -2, "days_remaining": -2 } },
+          "conditions": [
+            { "metric": "departmental_backlog", "min": 60, "multiplier": 1.45 }
+          ]
+        },
+        {
+          "id": "inspection_promised",
+          "message": "A site inspection is promised, but no date is committed in writing.",
+          "base_weight": 28,
+          "progress_min": 5,
+          "progress_max": 10,
+          "effect": { "documentation": 2 },
+          "conditions": []
+        }
+      ]
+    },
+    {
+      "id": "collect_signatures",
+      "title": "Mobilise the neighbourhood",
+      "description": "Collect signatures, photographs and short resident statements.",
+      "cost": { "money": 500, "energy": 8, "influence": 0, "days": 7 },
+      "guaranteed_effect": {
+        "community_support": 18,
+        "documentation": 7,
+        "public_attention": 3
+      },
+      "requirements": [],
+      "outcomes": [
+        {
+          "id": "strong_turnout",
+          "message": "Residents participate actively and the complaint gains collective legitimacy.",
+          "base_weight": 55,
+          "progress_min": 5,
+          "progress_max": 10,
+          "effect": { "community_support": 10 },
+          "conditions": [
+            { "metric": "community_support", "min": 25, "multiplier": 1.3 }
+          ]
+        },
+        {
+          "id": "fear_of_retaliation",
+          "message": "Several residents refuse to sign because they fear conflict with local officials.",
+          "base_weight": 28,
+          "progress_min": 1,
+          "progress_max": 4,
+          "effect": { "community_support": -4, "resources": { "energy": -3 } },
+          "conditions": []
+        },
+        {
+          "id": "resident_committee",
+          "message": "A resident committee forms and agrees to share follow-up work.",
+          "base_weight": 17,
+          "progress_min": 8,
+          "progress_max": 14,
+          "effect": { "resources": { "energy": 5, "influence": 4 } },
+          "conditions": [
+            { "metric": "community_support", "min": 45, "multiplier": 1.8 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "file_rti",
+      "title": "File an information request",
+      "description": "Request the file status, responsible officer, budget head and inspection notes.",
+      "cost": { "money": 350, "energy": 5, "influence": 0, "days": 12 },
+      "guaranteed_effect": { "documentation": 12 },
+      "requirements": [
+        { "metric": "progress", "min": 8, "message": "A traceable complaint should exist before requesting its records." }
+      ],
+      "outcomes": [
+        {
+          "id": "useful_disclosure",
+          "message": "The response identifies the responsible engineer and exposes an overdue inspection.",
+          "base_weight": 38,
+          "progress_min": 12,
+          "progress_max": 20,
+          "effect": { "public_attention": 4 },
+          "conditions": [
+            { "metric": "documentation", "min": 25, "multiplier": 1.45 },
+            { "metric": "officer_integrity", "min": 50, "multiplier": 1.2 }
+          ]
+        },
+        {
+          "id": "vague_reply",
+          "message": "The department sends a procedural reply that reveals little beyond the file number.",
+          "base_weight": 42,
+          "progress_min": 3,
+          "progress_max": 8,
+          "effect": {},
+          "conditions": [
+            { "metric": "departmental_backlog", "min": 60, "multiplier": 1.3 }
+          ]
+        },
+        {
+          "id": "no_reply",
+          "message": "No response arrives within the expected period; an appeal is now possible.",
+          "base_weight": 20,
+          "progress_min": 0,
+          "progress_max": 3,
+          "effect": { "resources": { "energy": -3, "days_remaining": -10 } },
+          "conditions": []
+        }
+      ]
+    },
+    {
+      "id": "contact_councillor",
+      "title": "Approach the ward councillor",
+      "description": "Ask the elected representative to push the department and arrange an inspection.",
+      "cost": { "money": 900, "energy": 5, "influence": 8, "days": 5 },
+      "guaranteed_effect": { "public_attention": 5 },
+      "requirements": [
+        { "metric": "community_support", "min": 25, "message": "Build visible neighbourhood support first." }
+      ],
+      "outcomes": [
+        {
+          "id": "political_push",
+          "message": "The councillor calls the municipal office and secures a dated inspection order.",
+          "base_weight": 35,
+          "progress_min": 16,
+          "progress_max": 26,
+          "effect": {},
+          "conditions": [
+            { "metric": "election_pressure", "min": 55, "multiplier": 1.8 },
+            { "metric": "community_support", "min": 50, "multiplier": 1.35 }
+          ]
+        },
+        {
+          "id": "symbolic_support",
+          "message": "The councillor expresses support publicly but makes no binding commitment.",
+          "base_weight": 45,
+          "progress_min": 4,
+          "progress_max": 10,
+          "effect": { "public_attention": 5 },
+          "conditions": []
+        },
+        {
+          "id": "political_condition",
+          "message": "Support is offered only if residents attend a political event, creating internal disagreement.",
+          "base_weight": 20,
+          "progress_min": 2,
+          "progress_max": 7,
+          "effect": { "community_support": -7, "integrity": -4 },
+          "conditions": [
+            { "metric": "election_pressure", "min": 60, "multiplier": 1.25 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "media_campaign",
+      "title": "Escalate through local media",
+      "description": "Give documented evidence to a local reporter and publish the resident timeline.",
+      "cost": { "money": 1400, "energy": 10, "influence": 3, "days": 6 },
+      "guaranteed_effect": { "public_attention": 22 },
+      "requirements": [
+        { "metric": "documentation", "min": 25, "message": "Gather stronger documentary evidence before contacting media." },
+        { "metric": "community_support", "min": 30, "message": "The story needs credible resident support." }
+      ],
+      "outcomes": [
+        {
+          "id": "coverage",
+          "message": "The story is published with photographs and officials announce an urgent inspection.",
+          "base_weight": 38,
+          "progress_min": 18,
+          "progress_max": 30,
+          "effect": {},
+          "conditions": [
+            { "metric": "documentation", "min": 45, "multiplier": 1.45 },
+            { "metric": "public_attention", "min": 30, "multiplier": 1.25 }
+          ]
+        },
+        {
+          "id": "limited_interest",
+          "message": "The reporter mentions the issue briefly, but it does not generate sustained pressure.",
+          "base_weight": 40,
+          "progress_min": 5,
+          "progress_max": 12,
+          "effect": {},
+          "conditions": []
+        },
+        {
+          "id": "official_pushback",
+          "message": "Officials dispute the account and relations with the local office become more difficult.",
+          "base_weight": 22,
+          "progress_min": 0,
+          "progress_max": 6,
+          "effect": { "resources": { "energy": -5, "influence": -2 } },
+          "conditions": [
+            { "metric": "officer_integrity", "max": 40, "multiplier": 1.6 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "court_case",
+      "title": "File a public-interest petition",
+      "description": "Engage a lawyer and ask the court for a time-bound municipal response.",
+      "cost": { "money": 8500, "energy": 15, "influence": 0, "days": 28 },
+      "guaranteed_effect": { "public_attention": 12, "documentation": 10 },
+      "requirements": [
+        { "metric": "documentation", "min": 45, "message": "A court filing needs a stronger documentary record." },
+        { "metric": "progress", "min": 20, "message": "Demonstrate that administrative remedies were attempted first." }
+      ],
+      "outcomes": [
+        {
+          "id": "notice_issued",
+          "message": "The court issues notice and requires the municipality to submit a time-bound action report.",
+          "base_weight": 45,
+          "progress_min": 28,
+          "progress_max": 42,
+          "effect": {},
+          "conditions": [
+            { "metric": "documentation", "min": 60, "multiplier": 1.55 }
+          ]
+        },
+        {
+          "id": "adjournment",
+          "message": "The matter is admitted but adjourned; legal pressure exists, yet the deadline keeps approaching.",
+          "base_weight": 38,
+          "progress_min": 10,
+          "progress_max": 18,
+          "effect": { "resources": { "days_remaining": -18, "energy": -4 } },
+          "conditions": []
+        },
+        {
+          "id": "technical_dismissal",
+          "message": "The petition is dismissed on a technical ground with liberty to pursue another remedy.",
+          "base_weight": 17,
+          "progress_min": 0,
+          "progress_max": 5,
+          "effect": { "resources": { "money": -2500, "energy": -8 } },
+          "conditions": [
+            { "metric": "documentation", "max": 54, "multiplier": 1.7 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "informal_payment",
+      "title": "Make an informal payment",
+      "description": "Take a costly illegal shortcut. It may accelerate the file, create further demands or trigger consequences.",
+      "cost": { "money": 4500, "energy": 6, "influence": 0, "days": 2 },
+      "guaranteed_effect": { "integrity": -22 },
+      "requirements": [
+        { "metric": "progress", "min": 5, "message": "There is not yet a traceable file to influence." }
+      ],
+      "outcomes": [
+        {
+          "id": "accelerated",
+          "message": "The file moves rapidly and a work order is prepared, but the transaction remains a future liability.",
+          "base_weight": 34,
+          "progress_min": 20,
+          "progress_max": 36,
+          "effect": { "resources": { "influence": -2 } },
+          "conditions": [
+            { "metric": "corruption_pressure", "min": 55, "multiplier": 1.8 },
+            { "metric": "officer_integrity", "max": 45, "multiplier": 1.45 }
+          ]
+        },
+        {
+          "id": "new_demand",
+          "message": "The intermediary demands more money and provides no verifiable progress.",
+          "base_weight": 43,
+          "progress_min": 0,
+          "progress_max": 6,
+          "effect": { "resources": { "money": -2500, "energy": -5 } },
+          "conditions": [
+            { "metric": "corruption_pressure", "min": 60, "multiplier": 1.25 }
+          ]
+        },
+        {
+          "id": "reported",
+          "message": "The approach reaches an honest officer; the citizen withdraws and becomes vulnerable to scrutiny.",
+          "base_weight": 23,
+          "progress_min": 0,
+          "progress_max": 3,
+          "effect": { "resources": { "influence": -6, "days_remaining": -8 }, "integrity": -8 },
+          "conditions": [
+            { "metric": "officer_integrity", "min": 65, "multiplier": 2.0 }
+          ]
+        }
+      ]
+    }
+  ]
+}
+</script>
+<script>(() => {
+  const pack = JSON.parse(document.getElementById('embeddedGamePack').textContent);
+  const storeKey = 'civic-sim-offline-sessions';
+  let memoryStore = {};
+
+  function loadStore() {
+    try { return JSON.parse(localStorage.getItem(storeKey) || '{}'); }
+    catch { return structuredClone(memoryStore); }
+  }
+
+  function saveStore(store) {
+    memoryStore = structuredClone(store);
+    try { localStorage.setItem(storeKey, JSON.stringify(store)); }
+    catch { /* opaque origins use the in-memory fallback */ }
+  }
+
+  function randomId() {
+    return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
+
+  function mulberry32(seed) {
+    return function next() {
+      let t = seed += 0x6D2B79F5;
+      t = Math.imul(t ^ t >>> 15, t | 1);
+      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function integer(rng, min, max) {
+    return Math.floor(rng() * (max - min + 1)) + min;
+  }
+
+  function metric(session, name) {
+    const lookup = {
+      progress: session.metrics.progress,
+      documentation: session.metrics.documentation,
+      community_support: session.metrics.community_support,
+      public_attention: session.metrics.public_attention,
+      integrity: session.metrics.integrity,
+      money: session.resources.money,
+      energy: session.resources.energy,
+      influence: session.resources.influence,
+      days_remaining: session.resources.days_remaining,
+      departmental_backlog: session.hidden.departmental_backlog,
+      officer_integrity: session.hidden.officer_integrity,
+      election_pressure: session.hidden.election_pressure,
+      corruption_pressure: session.hidden.corruption_pressure,
+    };
+    return Number(lookup[name] ?? 0);
+  }
+
+  function checkAction(session, action) {
+    const cost = action.cost;
+    if (session.resources.money < cost.money || session.resources.energy < cost.energy || session.resources.influence < cost.influence || session.resources.days_remaining <= cost.days) {
+      return `insufficient resources: requires ₹${cost.money}, ${cost.energy} energy, ${cost.influence} influence and ${cost.days} days`;
+    }
+    for (const requirement of action.requirements || []) {
+      const value = metric(session, requirement.metric);
+      if ((requirement.min != null && value < requirement.min) || (requirement.max != null && value > requirement.max)) return `action unavailable: ${requirement.message}`;
+    }
+    return null;
+  }
+
+  function applyDelta(session, delta = {}) {
+    const resources = delta.resources || {};
+    session.resources.money += resources.money || 0;
+    session.resources.energy += resources.energy || 0;
+    session.resources.influence += resources.influence || 0;
+    session.resources.days_remaining += resources.days_remaining || 0;
+    session.metrics.progress += delta.progress || 0;
+    session.metrics.documentation += delta.documentation || 0;
+    session.metrics.community_support += delta.community_support || 0;
+    session.metrics.public_attention += delta.public_attention || 0;
+    session.metrics.integrity += delta.integrity || 0;
+  }
+
+  function clamp(session) {
+    for (const key of ['progress', 'documentation', 'community_support', 'public_attention', 'integrity']) {
+      session.metrics[key] = Math.max(0, Math.min(100, session.metrics[key]));
+    }
+    session.resources.energy = Math.max(0, Math.min(100, session.resources.energy));
+    session.resources.influence = Math.max(0, Math.min(100, session.resources.influence));
+    session.resources.days_remaining = Math.max(0, session.resources.days_remaining);
+  }
+
+  function resolve(session) {
+    if (session.metrics.progress >= pack.mission.win_progress) {
+      session.status = 'won';
+      session.current_status = 'The drainage repair has been completed and verified by residents.';
+    } else if (session.resources.days_remaining <= 0) {
+      session.status = 'lost';
+      session.current_status = 'The deadline expired before the work could be completed.';
+    } else if (session.resources.energy <= 0) {
+      session.status = 'lost';
+      session.current_status = 'The citizen exhausted their capacity to continue pursuing the case.';
+    } else if (session.resources.money < 0) {
+      session.status = 'lost';
+      session.current_status = 'The citizen can no longer finance the campaign.';
+    }
+  }
+
+  function publicState(session) {
+    return {
+      id: session.id,
+      citizen_id: session.citizen_id,
+      citizen_name: session.citizen_name,
+      citizen_context: session.citizen_context,
+      mission_title: session.mission_title,
+      objective: session.objective,
+      current_status: session.current_status,
+      resources: structuredClone(session.resources),
+      metrics: structuredClone(session.metrics),
+      status: session.status,
+      turn: session.turn,
+      events: structuredClone(session.events),
+      available_actions: pack.actions.map((action) => {
+        const reason = session.status === 'active' ? checkAction(session, action) : 'session is already finished';
+        return {
+          id: action.id,
+          title: action.title,
+          description: action.description,
+          cost: action.cost,
+          enabled: !reason && session.status === 'active',
+          disabled_reason: reason,
+        };
+      }),
+    };
+  }
+
+  function create(citizenId, existingId = null) {
+    const citizen = pack.citizens.find((item) => item.id === citizenId);
+    if (!citizen) throw new Error('citizen profile not found');
+    const seed = Math.floor(Math.random() * 0xFFFFFFFF);
+    const rng = mulberry32(seed);
+    return {
+      id: existingId || randomId(),
+      game_pack_id: pack.id,
+      citizen_id: citizen.id,
+      citizen_name: citizen.name,
+      citizen_context: citizen.context,
+      mission_title: pack.mission.title,
+      objective: pack.mission.objective,
+      current_status: pack.mission.starting_status,
+      resources: structuredClone(citizen.starting_resources),
+      metrics: structuredClone(citizen.starting_metrics),
+      hidden: {
+        departmental_backlog: integer(rng, 30, 90),
+        officer_integrity: integer(rng, 25, 95),
+        election_pressure: integer(rng, 10, 90),
+        corruption_pressure: integer(rng, 10, 85),
+      },
+      status: 'active',
+      turn: 0,
+      seed,
+      events: [],
+      action_results: {},
+    };
+  }
+
+  function act(session, request) {
+    if (session.action_results[request.client_action_id]) return session.action_results[request.client_action_id];
+    if (session.status !== 'active') throw new Error('session is already finished');
+    const action = pack.actions.find((item) => item.id === request.action_id);
+    if (!action) throw new Error('action not found');
+    const unavailable = checkAction(session, action);
+    if (unavailable) throw new Error(unavailable);
+
+    session.resources.money -= action.cost.money;
+    session.resources.energy -= action.cost.energy;
+    session.resources.influence -= action.cost.influence;
+    session.resources.days_remaining -= action.cost.days;
+    applyDelta(session, action.guaranteed_effect);
+
+    const rng = mulberry32((session.seed ^ Math.imul(session.turn + 1, 0x9E3779B9)) >>> 0);
+    const weighted = action.outcomes.map((outcome) => {
+      let weight = outcome.base_weight;
+      for (const condition of outcome.conditions || []) {
+        const value = metric(session, condition.metric);
+        const matches = (condition.min == null || value >= condition.min) && (condition.max == null || value <= condition.max);
+        if (matches) weight *= condition.multiplier;
+      }
+      return { outcome, weight: Math.max(0.001, weight) };
+    });
+    const total = weighted.reduce((sum, item) => sum + item.weight, 0);
+    let roll = rng() * total;
+    let selected = weighted[weighted.length - 1].outcome;
+    for (const item of weighted) {
+      if (roll < item.weight) { selected = item.outcome; break; }
+      roll -= item.weight;
+    }
+
+    const before = session.metrics.progress;
+    applyDelta(session, selected.effect);
+    session.metrics.progress += selected.progress_max > selected.progress_min
+      ? integer(rng, selected.progress_min, selected.progress_max)
+      : selected.progress_min;
+    clamp(session);
+    session.turn += 1;
+    session.current_status = selected.message;
+    resolve(session);
+    const progressChange = session.metrics.progress - before;
+    session.events.push({
+      turn: session.turn,
+      action_id: action.id,
+      action_title: action.title,
+      outcome_id: selected.id,
+      message: selected.message,
+      progress_change: progressChange,
+      resources_after: structuredClone(session.resources),
+    });
+    const response = {
+      outcome_id: selected.id,
+      message: selected.message,
+      progress_change: progressChange,
+      state: publicState(session),
+    };
+    session.action_results[request.client_action_id] = response;
+    return response;
+  }
+
+  function jsonResponse(body, status = 200) {
+    return Promise.resolve(new Response(JSON.stringify(body), {
+      status,
+      headers: { 'Content-Type': 'application/json' },
+    }));
+  }
+
+  globalThis.fetch = async (input, options = {}) => {
+    try {
+      const url = new URL(String(input), 'http://offline.local');
+      const path = url.pathname;
+      const method = (options.method || 'GET').toUpperCase();
+      const sessions = loadStore();
+
+      if (path === '/api/v1/health' && method === 'GET') {
+        return jsonResponse({ status: 'ok', game_pack: pack.id, version: 'offline', sessions: Object.keys(sessions).length });
+      }
+      if (path === '/api/v1/scenario' && method === 'GET') {
+        return jsonResponse({
+          id: pack.id,
+          title: pack.title,
+          description: pack.description,
+          version: pack.version,
+          mission: pack.mission,
+          citizens: pack.citizens,
+        });
+      }
+      if (path === '/api/v1/sessions' && method === 'POST') {
+        const body = JSON.parse(options.body || '{}');
+        const session = create(body.citizen_id);
+        sessions[session.id] = session;
+        saveStore(sessions);
+        return jsonResponse(publicState(session), 201);
+      }
+      const match = path.match(/^\/api\/v1\/sessions\/([^/]+)(?:\/(actions|reset))?$/);
+      if (match) {
+        const id = decodeURIComponent(match[1]);
+        const operation = match[2];
+        let session = sessions[id];
+        if (!session) return jsonResponse({ error: 'session not found' }, 404);
+        if (!operation && method === 'GET') return jsonResponse(publicState(session));
+        if (operation === 'actions' && method === 'POST') {
+          const result = act(session, JSON.parse(options.body || '{}'));
+          sessions[id] = session;
+          saveStore(sessions);
+          return jsonResponse(result);
+        }
+        if (operation === 'reset' && method === 'POST') {
+          session = create(session.citizen_id, id);
+          sessions[id] = session;
+          saveStore(sessions);
+          return jsonResponse(publicState(session));
+        }
+      }
+      return jsonResponse({ error: 'offline route not found' }, 404);
+    } catch (error) {
+      return jsonResponse({ error: error instanceof Error ? error.message : String(error) }, 400);
+    }
+  };
+})();
+</script>
+<script>const app = document.getElementById('app');
+const connectionBadge = document.getElementById('connectionBadge');
+const newGameButton = document.getElementById('newGameButton');
+const resultDialog = document.getElementById('resultDialog');
+const dialogLabel = document.getElementById('dialogLabel');
+const dialogTitle = document.getElementById('dialogTitle');
+const dialogMessage = document.getElementById('dialogMessage');
+const dialogDelta = document.getElementById('dialogDelta');
+const dialogClose = document.getElementById('dialogClose');
+
+let scenario = null;
+let state = null;
+let requestInFlight = false;
+const sessionStorageKey = 'civic-sim-session-id';
+const memoryStorage = new Map();
+
+function storageGet(key) {
+  try { return localStorage.getItem(key); }
+  catch { return memoryStorage.get(key) ?? null; }
+}
+
+function storageSet(key, value) {
+  try { localStorage.setItem(key, value); }
+  catch { memoryStorage.set(key, String(value)); }
+}
+
+function storageRemove(key) {
+  try { localStorage.removeItem(key); }
+  catch { memoryStorage.delete(key); }
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function formatMoney(value) {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function createClientActionId() {
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+async function api(path, options = {}) {
+  const response = await fetch(path, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(body.error || `Request failed (${response.status})`);
+  return body;
+}
+
+function setConnection(isOnline, label = null) {
+  connectionBadge.textContent = label || (isOnline ? 'Server online' : 'Server unavailable');
+  connectionBadge.className = `status-badge ${isOnline ? 'online' : 'offline'}`;
+}
+
+function renderError(message) {
+  app.innerHTML = `
+    <section class="empty-panel">
+      <p class="eyebrow">CONNECTION ERROR</p>
+      <h2>The game could not be loaded</h2>
+      <p>${escapeHtml(message)}</p>
+      <button id="retryButton" class="button button-primary" type="button">Retry</button>
+    </section>`;
+  document.getElementById('retryButton').addEventListener('click', boot);
+}
+
+function renderProfileSelection() {
+  newGameButton.hidden = true;
+  app.innerHTML = `
+    <section class="hero-card">
+      <p class="eyebrow">${escapeHtml(scenario.title)}</p>
+      <h2>${escapeHtml(scenario.mission.title)}</h2>
+      <p class="lead">${escapeHtml(scenario.description)}</p>
+      <div class="profile-grid">
+        ${scenario.citizens.map((citizen) => `
+          <article class="profile-card">
+            <span class="occupation">${escapeHtml(citizen.occupation)}</span>
+            <h3>${escapeHtml(citizen.name)}</h3>
+            <p>${escapeHtml(citizen.context)}</p>
+            <div class="resource-preview">
+              <span class="chip">${formatMoney(citizen.starting_resources.money)}</span>
+              <span class="chip">${citizen.starting_resources.energy} energy</span>
+              <span class="chip">${citizen.starting_resources.influence} influence</span>
+              <span class="chip">${citizen.starting_resources.days_remaining} days</span>
+            </div>
+            <button class="button button-primary select-profile" data-citizen-id="${escapeHtml(citizen.id)}" type="button">Play as ${escapeHtml(citizen.name.split(' ')[0])}</button>
+          </article>`).join('')}
+      </div>
+    </section>`;
+
+  document.querySelectorAll('.select-profile').forEach((button) => {
+    button.addEventListener('click', () => startSession(button.dataset.citizenId));
+  });
+}
+
+function costHtml(cost) {
+  const entries = [];
+  if (cost.money) entries.push(`<span><strong>${formatMoney(cost.money)}</strong></span>`);
+  if (cost.energy) entries.push(`<span>${cost.energy} energy</span>`);
+  if (cost.influence) entries.push(`<span>${cost.influence} influence</span>`);
+  if (cost.days) entries.push(`<span>${cost.days} days</span>`);
+  return entries.join('');
+}
+
+function metricBar(label, value) {
+  return `
+    <div class="stat-row">
+      <div class="stat-header"><span>${escapeHtml(label)}</span><strong>${value}/100</strong></div>
+      <div class="mini-track"><div class="mini-fill" style="width:${Math.max(0, Math.min(100, value))}%"></div></div>
+    </div>`;
+}
+
+function renderGame() {
+  newGameButton.hidden = false;
+  const statusClass = state.status === 'won' ? 'won' : 'lost';
+  const finished = state.status !== 'active';
+  const newestEvents = [...state.events].reverse();
+
+  app.innerHTML = `
+    <div class="game-layout">
+      <div class="main-column">
+        <section class="panel mission-panel">
+          <div class="panel-inner">
+            <p class="eyebrow">CURRENT MISSION</p>
+            <h2>${escapeHtml(state.mission_title)}</h2>
+            <p>${escapeHtml(state.objective)}</p>
+            <div class="citizen-strip">
+              <div><strong>${escapeHtml(state.citizen_name)}</strong><span>${escapeHtml(state.citizen_context)}</span></div>
+              <div class="turn-number"><span>Turn</span><strong>${state.turn}</strong></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-inner">
+            <div class="resource-grid">
+              <div class="metric-card"><div class="label">Money</div><div class="value">${formatMoney(state.resources.money)}</div></div>
+              <div class="metric-card"><div class="label">Energy</div><div class="value">${state.resources.energy}</div></div>
+              <div class="metric-card"><div class="label">Influence</div><div class="value">${state.resources.influence}</div></div>
+              <div class="metric-card"><div class="label">Days left</div><div class="value">${state.resources.days_remaining}</div></div>
+            </div>
+            <div class="progress-section">
+              <div class="progress-heading"><span>Mission progress</span><span>${state.metrics.progress}%</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:${state.metrics.progress}%"></div></div>
+              <p class="status-text">${escapeHtml(state.current_status)}</p>
+            </div>
+          </div>
+        </section>
+
+        ${finished ? `
+          <section class="end-banner ${statusClass}">
+            <h3>${state.status === 'won' ? 'Mission completed' : 'Mission failed'}</h3>
+            <p>${escapeHtml(state.current_status)}</p>
+            <button id="restartButton" class="button ${state.status === 'won' ? 'button-primary' : 'button-danger'}" type="button">Restart with the same citizen</button>
+          </section>` : `
+          <section class="panel">
+            <div class="panel-inner">
+              <div class="section-title"><h3>Choose the next action</h3><span>Outcomes are uncertain</span></div>
+              <div class="action-list">
+                ${state.available_actions.map((action) => `
+                  <button class="action-button" type="button" data-action-id="${escapeHtml(action.id)}" ${action.enabled && !requestInFlight ? '' : 'disabled'}>
+                    <span>
+                      <span class="action-title">${escapeHtml(action.title)}</span>
+                      <span class="action-description">${escapeHtml(action.description)}</span>
+                    </span>
+                    <span class="action-cost">${costHtml(action.cost)}</span>
+                    ${action.disabled_reason ? `<span class="disabled-reason">${escapeHtml(action.disabled_reason)}</span>` : ''}
+                  </button>`).join('')}
+              </div>
+            </div>
+          </section>`}
+      </div>
+
+      <aside class="side-column">
+        <section class="panel">
+          <div class="panel-inner">
+            <div class="section-title"><h3>Civic capacity</h3><span>Public knowledge</span></div>
+            <div class="secondary-metrics">
+              ${metricBar('Documentation', state.metrics.documentation)}
+              ${metricBar('Community support', state.metrics.community_support)}
+              ${metricBar('Public attention', state.metrics.public_attention)}
+              ${metricBar('Integrity', state.metrics.integrity)}
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-inner">
+            <div class="section-title"><h3>Case history</h3><span>${state.events.length} events</span></div>
+            <div class="timeline">
+              ${newestEvents.length ? newestEvents.map((event) => `
+                <article class="timeline-item">
+                  <h4>Turn ${event.turn}: ${escapeHtml(event.action_title)}</h4>
+                  <p>${escapeHtml(event.message)}</p>
+                  <div class="event-meta">${event.progress_change >= 0 ? '+' : ''}${event.progress_change}% progress · ${event.resources_after.days_remaining} days left</div>
+                </article>`).join('') : '<p class="action-description">No official action has been taken yet.</p>'}
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>`;
+
+  document.querySelectorAll('.action-button[data-action-id]').forEach((button) => {
+    button.addEventListener('click', () => takeAction(button.dataset.actionId));
+  });
+  document.getElementById('restartButton')?.addEventListener('click', resetSession);
+}
+
+async function startSession(citizenId) {
+  if (requestInFlight) return;
+  requestInFlight = true;
+  try {
+    const created = await api('/api/v1/sessions', {
+      method: 'POST',
+      body: JSON.stringify({ citizen_id: citizenId }),
+    });
+    state = created;
+    storageSet(sessionStorageKey, state.id);
+    requestInFlight = false;
+    renderGame();
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    requestInFlight = false;
+  }
+}
+
+async function takeAction(actionId) {
+  if (requestInFlight || state.status !== 'active') return;
+  requestInFlight = true;
+  renderGame();
+  try {
+    const result = await api(`/api/v1/sessions/${encodeURIComponent(state.id)}/actions`, {
+      method: 'POST',
+      body: JSON.stringify({
+        action_id: actionId,
+        client_action_id: createClientActionId(),
+      }),
+    });
+    state = result.state;
+    renderGame();
+    dialogLabel.textContent = state.status === 'won' ? 'MISSION COMPLETE' : state.status === 'lost' ? 'MISSION ENDED' : 'STOCHASTIC OUTCOME';
+    dialogTitle.textContent = result.progress_change > 12 ? 'Major movement' : result.progress_change > 0 ? 'The case moved' : 'No clear progress';
+    dialogMessage.textContent = result.message;
+    dialogDelta.textContent = `${result.progress_change >= 0 ? '+' : ''}${result.progress_change}% mission progress`;
+    if (typeof resultDialog.showModal === 'function') resultDialog.showModal();
+  } catch (error) {
+    alert(error.message);
+    await restoreSession();
+  } finally {
+    requestInFlight = false;
+    renderGame();
+  }
+}
+
+async function resetSession() {
+  if (!state || requestInFlight) return;
+  requestInFlight = true;
+  try {
+    state = await api(`/api/v1/sessions/${encodeURIComponent(state.id)}/reset`, { method: 'POST', body: '{}' });
+    requestInFlight = false;
+    renderGame();
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    requestInFlight = false;
+  }
+}
+
+async function restoreSession() {
+  const sessionId = storageGet(sessionStorageKey);
+  if (!sessionId) return false;
+  try {
+    state = await api(`/api/v1/sessions/${encodeURIComponent(sessionId)}`);
+    renderGame();
+    return true;
+  } catch {
+    storageRemove(sessionStorageKey);
+    return false;
+  }
+}
+
+async function boot() {
+  app.innerHTML = '<section class="loading-panel"><div class="spinner" aria-hidden="true"></div><p>Loading the civic simulation…</p></section>';
+  try {
+    const [health, loadedScenario] = await Promise.all([
+      api('/api/v1/health'),
+      api('/api/v1/scenario'),
+    ]);
+    scenario = loadedScenario;
+    setConnection(true, `${health.sessions} saved session${health.sessions === 1 ? '' : 's'}`);
+    const restored = await restoreSession();
+    if (!restored) renderProfileSelection();
+  } catch (error) {
+    setConnection(false);
+    renderError(error.message);
+  }
+}
+
+newGameButton.addEventListener('click', () => {
+  if (!confirm('Start a new game? The current session remains saved on the server.')) return;
+  state = null;
+  storageRemove(sessionStorageKey);
+  renderProfileSelection();
+});
+
+dialogClose.addEventListener('click', () => resultDialog.close());
+window.addEventListener('online', () => setConnection(true));
+window.addEventListener('offline', () => setConnection(false));
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+}
+
+boot();
+</script>
+</body>
+</html>

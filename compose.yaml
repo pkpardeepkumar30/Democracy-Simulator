@@ -1,0 +1,21 @@
+services:
+  game:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: civic-sim-mvp:local
+    container_name: civic-sim-mvp
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      RUST_LOG: "civic_sim_server=info,tower_http=info"
+      GAME_PACK_PATH: "/app/game-packs/drainage/game.json"
+      SESSION_STORE_PATH: "/data/sessions.json"
+    volumes:
+      - civic_game_data:/data
+    restart: unless-stopped
+
+volumes:
+  civic_game_data:
+    name: civic_game_data
