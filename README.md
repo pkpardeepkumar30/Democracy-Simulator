@@ -6,7 +6,7 @@ The package contains:
 
 - A low-latency Rust game server using Axum and Tokio.
 - A responsive browser game served by the Rust binary.
-- A locally bundled Phaser 3 civic-city renderer with code-native theme visuals, server-driven animations, reduced-motion handling and a DOM fallback.
+- A locally bundled Phaser 3 civic-city renderer with compact OpenStreetMap street geometry for New Delhi, Beijing and Rio de Janeiro, server-driven animations, reduced-motion handling and an SVG/DOM fallback.
 - Persistent saved sessions stored in a Docker volume.
 - A validated schema-v2 JSON/YAML game-pack library with three complete environments, nine player profiles, 31 state-gated actions, declarative institutions, stakeholders, hidden variables, random events, endings and visual themes.
 - A multi-scenario registry and catalog API; adding a validated `game.json` directory does not require engine changes.
@@ -97,6 +97,8 @@ Follow `MANUAL_TEST_CHECKLIST.md`. The minimum useful test is:
 10. Start a new game with another citizen and compare the constraints.
 
 Outcomes are stochastic. Restarting a session creates a new hidden administrative context and random seed.
+
+The real street geometry is contextual only: every civic scenario, character and institution location is fictional. Map data is © OpenStreetMap contributors and licensed under ODbL; import and attribution details are in `docs/MAP_DATA.md`.
 
 ## Test on an Android phone or iPhone now
 

@@ -1,6 +1,29 @@
 {
   "schema_version": 1,
   "categories": {
+    "city_plan": [
+      {
+        "id": "new_delhi_india",
+        "label": "New Delhi, India",
+        "description": "Central New Delhi street geometry from OpenStreetMap; all civic scenario content remains fictional.",
+        "map_asset": "osm:new-delhi-india",
+        "compatible_world_regions": ["south_asian_megacity"]
+      },
+      {
+        "id": "beijing_china",
+        "label": "Beijing, China",
+        "description": "Central Beijing street geometry from OpenStreetMap; all civic scenario content remains fictional.",
+        "map_asset": "osm:beijing-china",
+        "compatible_world_regions": ["east_asian_industrial_city"]
+      },
+      {
+        "id": "rio_de_janeiro_brazil",
+        "label": "Rio de Janeiro, Brazil",
+        "description": "Central Rio de Janeiro street geometry from OpenStreetMap; all civic scenario content remains fictional.",
+        "map_asset": "osm:rio-de-janeiro-brazil",
+        "compatible_world_regions": ["latin_american_provincial_city"]
+      }
+    ],
     "world_region": [
       { "id": "south_asian_megacity", "label": "South Asian megacity", "palette": { "primary_color": "#173b57", "accent_color": "#e89035", "background_color": "#eef5f7" }, "effects": { "event_chance_multiplier": 1.08 } },
       { "id": "northern_european_municipality", "label": "Northern European municipality", "palette": { "primary_color": "#24485a", "accent_color": "#d29a3a", "background_color": "#edf4f4" }, "effects": { "action_cost_multiplier": 0.94, "event_chance_multiplier": 0.9 } },

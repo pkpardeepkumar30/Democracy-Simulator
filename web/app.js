@@ -161,6 +161,7 @@ async function createCampaign(event) {
 }
 
 const generatorFields = [
+  ['city_plan', 'Real city plan'],
   ['world_region', 'World region'],
   ['political_system', 'Political system'],
   ['administrative_capacity', 'Administrative capacity'],
@@ -385,19 +386,49 @@ function eventChangeSummary(event) {
   return changes.length ? changes.join(' · ') : 'No visible civic factor changed';
 }
 
+function activeCityPlan() {
+  const asset = scenario?.visual_theme?.map_asset;
+  return asset ? globalThis.CivicCityPlans?.[asset] || null : null;
+}
+
+function cityPlanSvg(plan) {
+  if (!plan) return '<div class="city-river" aria-hidden="true"></div>';
+  const layers = ['water', 'rail', 'road'].map((kind) => `
+    <g class="map-layer map-${kind}">
+      ${plan.features.filter((feature) => feature.kind === kind).map((feature) =>
+        `<polyline class="map-${escapeHtml(feature.class)}" points="${feature.points.map((point) => `${point[0]},${point[1]}`).join(' ')}"></polyline>`,
+      ).join('')}
+    </g>`).join('');
+  return `<svg class="city-plan-svg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${layers}</svg>`;
+}
+
+function mapAttributionHtml(plan, mapAsset) {
+  if (!plan && !mapAsset?.startsWith('osm:')) return '';
+  const label = plan?.label || mapAsset.slice(4).replaceAll('-', ' ');
+  const sourceUrl = plan?.source_url || 'https://www.openstreetmap.org/';
+  const licenseUrl = globalThis.CivicCityMapLibrary?.license_url || 'https://www.openstreetmap.org/copyright';
+  return `
+    <div class="map-attribution">
+      <span>Street geometry: <strong>${escapeHtml(label)}</strong>. Civic scenario and institution locations are fictional.</span>
+      <span><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener">Map data © OpenStreetMap contributors</a> · <a href="${escapeHtml(licenseUrl)}" target="_blank" rel="noopener">ODbL</a></span>
+    </div>`;
+}
+
 function cityMapHtml() {
   const locations = scenario?.visual_theme?.locations || [];
   const validActions = state.available_actions.filter((action) => action.enabled);
   if (!locations.length) return '';
   const rendererAvailable = typeof globalThis.CivicCityRenderer === 'function';
+  const mapAsset = scenario?.visual_theme?.map_asset || null;
+  const mapPlan = activeCityPlan();
   return `
     <section class="panel city-panel">
       <div class="panel-inner">
-        <div class="section-title"><h3>Civic environment</h3><span>${escapeHtml(scenario.environment.world_region)}</span></div>
+        <div class="section-title"><h3>Civic environment</h3><span>${escapeHtml(mapPlan?.label || scenario.environment.world_region)}</span></div>
         <div class="city-map" role="group" aria-label="Scenario institutions and action locations">
           ${rendererAvailable ? '<div id="cityCanvasHost" class="city-canvas-host" aria-hidden="true"></div>' : ''}
           <div id="cityDomFallback" class="city-dom-fallback" ${rendererAvailable ? 'hidden' : ''}>
-            <div class="city-river" aria-hidden="true"></div>
+            ${rendererAvailable ? '' : cityPlanSvg(mapPlan)}
             ${locations.map((location) => {
             const selectable = validActions.find((action) => action.location_id === location.id);
             if (!selectable) return `<span class="city-location context" style="left:${location.x}%;top:${location.y}%"><span>${escapeHtml(location.label)}</span></span>`;
@@ -405,6 +436,7 @@ function cityMapHtml() {
             }).join('')}
           </div>
         </div>
+        ${mapAttributionHtml(mapPlan, mapAsset)}
       </div>
     </section>`;
 }

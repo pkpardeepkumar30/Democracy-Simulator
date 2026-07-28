@@ -6,6 +6,7 @@ COPY web/package.json web/package-lock.json ./
 RUN npm ci
 COPY web/tsconfig.json web/vite.config.ts ./
 COPY web/city-src ./city-src
+COPY web/city-data ./city-data
 COPY web/tests ./tests
 RUN npm run typecheck && npm test && npm run build
 

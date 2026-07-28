@@ -3,7 +3,7 @@
   "id": "factory-ground-v1",
   "title": "Factory Ground",
   "description": "Acquire defensible land, finance a food-processing factory, earn community consent and complete environmental and utility approvals.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "campaign": {
     "imports": [
       { "source_id": "civic_reputation", "target_id": "community_support", "multiplier": 0.25, "min": -15, "max": 15 },
@@ -148,6 +148,7 @@
     "primary_color": "#17463c",
     "accent_color": "#d59b32",
     "background_color": "#f0e7cf",
+    "map_asset": "osm:rio-de-janeiro-brazil",
     "locations": [
       { "id": "market", "label": "Central Market", "x": 18, "y": 66 },
       { "id": "site", "label": "Proposed factory site", "x": 38, "y": 62 },

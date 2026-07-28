@@ -170,6 +170,16 @@ button { touch-action: manipulation; }
 .city-canvas-host, .city-dom-fallback { position: absolute; inset: 0; }
 .city-canvas-host canvas { display: block; width: 100% !important; height: 100% !important; }
 .city-dom-fallback[hidden] { display: none; }
+.city-plan-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.city-plan-svg polyline { fill: none; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
+.map-water polyline { stroke: #54a8ca; stroke-width: 4; opacity: .72; }
+.map-rail polyline { stroke: #57636b; stroke-width: 1.5; opacity: .34; }
+.map-road polyline { stroke: #c2aa7d; stroke-width: 1.6; opacity: .74; }
+.map-road .map-primary { stroke-width: 3.5; }
+.map-road .map-trunk { stroke-width: 4.5; }
+.map-road .map-motorway { stroke: #d89b42; stroke-width: 5.5; }
+.map-attribution { display: flex; justify-content: space-between; gap: 12px; margin-top: 9px; color: var(--muted); font-size: .68rem; line-height: 1.45; }
+.map-attribution a { color: var(--navy); }
 .city-map::before, .city-map::after { content: ""; position: absolute; border-radius: 38%; background: color-mix(in srgb, var(--green) 18%, transparent); }
 .city-map::before { width: 34%; height: 38%; left: -6%; bottom: -12%; transform: rotate(-12deg); }
 .city-map::after { width: 26%; height: 30%; right: -4%; top: -8%; transform: rotate(18deg); }
@@ -243,6 +253,7 @@ footer { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; padd
   .action-cost { display: flex; flex-wrap: wrap; gap: 8px; text-align: left; }
   .citizen-strip { align-items: flex-start; }
   .city-map { min-height: 280px; }
+  .map-attribution { display: grid; }
   .city-location { width: 78px; min-height: 48px; font-size: .62rem; }
   .generator-callout { align-items: stretch; flex-direction: column; }
   .campaign-panel { grid-template-columns: 1fr; }

@@ -264,6 +264,20 @@ pub fn validate_pack(pack: &GamePack) -> Result<(), Vec<String>> {
             .map(|value| value.id.as_str()),
         &mut errors,
     );
+    if let Some(map_asset) = pack.visual_theme.map_asset.as_deref() {
+        if map_asset.trim().is_empty()
+            || !map_asset.chars().all(|character| {
+                character.is_ascii_lowercase()
+                    || character.is_ascii_digit()
+                    || ":_-".contains(character)
+            })
+        {
+            errors.push(format!(
+                "visual theme map_asset '{}' must be a non-empty logical asset id",
+                map_asset
+            ));
+        }
+    }
 
     let institution_ids: HashSet<_> = pack
         .institutions
@@ -627,6 +641,17 @@ mod tests {
         assert!(errors
             .iter()
             .any(|error| error.contains("model changed circumstances as a distinct")));
+    }
+
+    #[test]
+    fn validator_rejects_invalid_map_asset_ids() {
+        let mut pack: GamePack =
+            serde_json::from_str(include_str!("../game-packs/drainage/game.json")).unwrap();
+        pack.visual_theme.map_asset = Some("../city map.json".into());
+        let errors = validate_pack(&pack).unwrap_err();
+        assert!(errors
+            .iter()
+            .any(|error| error.contains("non-empty logical asset id")));
     }
 
     #[test]

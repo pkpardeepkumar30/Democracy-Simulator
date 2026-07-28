@@ -19,6 +19,12 @@ await page.evaluate(() => localStorage.clear());
 await page.reload({ waitUntil: 'load' });
 await page.locator('.select-scenario').click();
 await page.locator('.select-profile').first().click();
+if (!(await page.locator('.map-attribution').textContent())?.includes('New Delhi, India')) {
+  throw new Error('standalone real-map attribution is missing');
+}
+if (await page.locator('.city-plan-svg polyline').count() < 100) {
+  throw new Error('standalone did not render imported city geometry');
+}
 
 const initialIds = await page.locator('.action-button').evaluateAll((buttons) =>
   buttons.map((button) => button.dataset.actionId),

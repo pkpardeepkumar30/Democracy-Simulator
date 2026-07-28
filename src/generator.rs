@@ -30,6 +30,7 @@ pub const REQUIRED_CATEGORIES: &[&str] = &[
     "player_role",
     "objective_type",
 ];
+pub const OPTIONAL_CATEGORIES: &[&str] = &["city_plan"];
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AbstractionCatalog {
@@ -52,6 +53,10 @@ pub struct AbstractionOption {
     pub effects: GenerationEffects,
     #[serde(default)]
     pub palette: Option<ThemePalette>,
+    #[serde(default)]
+    pub map_asset: Option<String>,
+    #[serde(default)]
+    pub compatible_world_regions: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -247,6 +252,30 @@ impl AbstractionCatalog {
                 _ => errors.push(format!("category '{category}' must contain options")),
             }
         }
+        for category in OPTIONAL_CATEGORIES {
+            if let Some(options) = self.categories.get(*category) {
+                if options.is_empty() {
+                    errors.push(format!("category '{category}' must contain options"));
+                } else {
+                    validate_option_ids(category, options, &mut errors);
+                    if *category == "city_plan" {
+                        for option in options {
+                            for region in &option.compatible_world_regions {
+                                if !self.categories["world_region"]
+                                    .iter()
+                                    .any(|candidate| &candidate.id == region)
+                                {
+                                    errors.push(format!(
+                                        "city plan '{}' references unknown world region '{}'",
+                                        option.id, region
+                                    ));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         validate_ids(
             "difficulty",
             self.difficulties.iter().map(|item| item.id.as_str()),
@@ -400,7 +429,9 @@ where
     let mut errors = Vec::new();
     let explicit_categories: HashSet<_> = request.selections.keys().cloned().collect();
     for key in request.selections.keys() {
-        if !REQUIRED_CATEGORIES.contains(&key.as_str()) {
+        if !REQUIRED_CATEGORIES.contains(&key.as_str())
+            && !OPTIONAL_CATEGORIES.contains(&key.as_str())
+        {
             errors.push(format!("unknown category '{key}'"));
         }
     }
@@ -420,6 +451,49 @@ where
             }
         };
         if let Some(option) = option {
+            selected.insert((*category).to_string(), option.id.clone());
+        }
+    }
+    for category in OPTIONAL_CATEGORIES {
+        let Some(options) = catalog.categories.get(*category) else {
+            continue;
+        };
+        let requested = request.selections.get(*category);
+        let option = match requested {
+            Some(id) => options.iter().find(|item| &item.id == id).or_else(|| {
+                errors.push(format!("unknown {category} option '{id}'"));
+                None
+            }),
+            None if request.randomize_unspecified => {
+                let region = selected.get("world_region");
+                let compatible: Vec<_> = options
+                    .iter()
+                    .filter(|item| {
+                        item.compatible_world_regions.is_empty()
+                            || region.is_some_and(|region| {
+                                item.compatible_world_regions.contains(region)
+                            })
+                    })
+                    .collect();
+                compatible.choose(&mut rng).copied()
+            }
+            None => None,
+        };
+        if let Some(option) = option {
+            if !option.compatible_world_regions.is_empty()
+                && selected
+                    .get("world_region")
+                    .is_some_and(|region| !option.compatible_world_regions.contains(region))
+            {
+                if explicit_categories.contains("world_region") {
+                    errors.push(format!(
+                        "{} is not compatible with the selected world region",
+                        option.label
+                    ));
+                } else if let Some(region) = option.compatible_world_regions.first() {
+                    selected.insert("world_region".to_string(), region.clone());
+                }
+            }
             selected.insert((*category).to_string(), option.id.clone());
         }
     }
@@ -518,6 +592,8 @@ where
             pack.visual_theme.background_color = palette.background_color.clone();
         }
     }
+    let city_plan = selected_option(catalog, &selected, "city_plan");
+    pack.visual_theme.map_asset = city_plan.and_then(|option| option.map_asset.clone());
     if let Some(role) = selected_option(catalog, &selected, "player_role") {
         let profile_index = rng.random_range(0..pack.citizens.len());
         let mut profile = pack.citizens[profile_index].clone();
@@ -550,13 +626,24 @@ where
     );
     let region = selected_option(catalog, &selected, "world_region").expect("validated above");
     pack.id = format!("generated-{}-{identity:016x}", template.pack_id);
-    pack.title = format!("{} — {}", pack.title, region.label);
-    pack.description = format!(
-        "A generated {} scenario in a {} environment. {}",
-        difficulty.label.to_lowercase(),
-        region.label,
-        pack.description
-    );
+    if let Some(city_plan) = city_plan {
+        pack.title = format!("{} — {}", pack.title, city_plan.label);
+        pack.description = format!(
+            "A generated {} scenario in a {} environment, rendered over the street geometry of {}. The civic scenario and institution locations are fictional. {}",
+            difficulty.label.to_lowercase(),
+            region.label,
+            city_plan.label,
+            pack.description
+        );
+    } else {
+        pack.title = format!("{} — {}", pack.title, region.label);
+        pack.description = format!(
+            "A generated {} scenario in a {} environment. {}",
+            difficulty.label.to_lowercase(),
+            region.label,
+            pack.description
+        );
+    }
     pack.version = format!("{}+generated.{identity:016x}", pack.version);
     pack.generated = Some(GeneratedScenarioMetadata {
         seed,
@@ -944,6 +1031,39 @@ mod tests {
                     .cost
                     .energy
         );
+    }
+
+    #[test]
+    fn explicit_city_plan_sets_map_and_repairs_unspecified_region() {
+        let (catalog, registry) = fixtures();
+        let selections = [
+            ("objective_type".into(), "business_land".into()),
+            ("city_plan".into(), "rio_de_janeiro_brazil".into()),
+        ]
+        .into_iter()
+        .collect();
+        let generated = generate_pack(
+            &catalog,
+            GenerateScenarioRequest {
+                seed: Some(20260727),
+                selections,
+                ..Default::default()
+            },
+            |id| registry.get(id),
+        )
+        .unwrap();
+        assert_eq!(
+            generated.visual_theme.map_asset.as_deref(),
+            Some("osm:rio-de-janeiro-brazil")
+        );
+        assert_eq!(
+            generated.environment.world_region,
+            "Latin American provincial city"
+        );
+        assert!(generated.title.contains("Rio de Janeiro, Brazil"));
+        assert!(generated
+            .description
+            .contains("institution locations are fictional"));
     }
 
     #[test]

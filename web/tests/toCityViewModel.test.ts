@@ -7,6 +7,7 @@ describe('toCityViewModel', () => {
       {
         visual_theme: {
           primary_color: '#112233',
+          map_asset: 'osm:new-delhi-india',
           locations: [
             { id: 'office', label: 'Office', x: 120, y: -10 },
             { id: 'court', label: 'Court', x: 50, y: 50 },
@@ -29,6 +30,8 @@ describe('toCityViewModel', () => {
     expect(view.locations[1]).toMatchObject({ actionId: 'open', enabled: true });
     expect(view.playerLocationId).toBe('court');
     expect(view.factors).toEqual([{ id: 'documentation', label: 'Evidence strength', value: 35, min: 0, max: 100, group: 'metric' }]);
+    expect(view.mapPlan).toMatchObject({ id: 'new-delhi-india', label: 'New Delhi, India' });
+    expect(view.mapPlan?.features.length).toBeGreaterThan(100);
   });
 
   it('disables every hotspot after a terminal result and preserves the visual cue', () => {
@@ -46,5 +49,6 @@ describe('toCityViewModel', () => {
     expect(view.locations[0].enabled).toBe(false);
     expect(view.visualEvent).toEqual(cue);
     expect(view.factors).toEqual([]);
+    expect(view.mapPlan).toBeNull();
   });
 });

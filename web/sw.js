@@ -1,4 +1,4 @@
-const CACHE = 'democracy-simulator-shell-v5';
+const CACHE = 'democracy-simulator-shell-v6';
 const SHELL = ['/', '/styles.css', '/city.bundle.js', '/app.js', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {

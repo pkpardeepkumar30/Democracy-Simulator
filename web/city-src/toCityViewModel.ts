@@ -1,4 +1,5 @@
 import type { CityViewModel, PublicScenario, PublicState, VisualEvent } from './types';
+import { cityPlanForAsset } from './cityPlans';
 
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, Number.isFinite(value) ? value : min));
@@ -42,6 +43,7 @@ export function toCityViewModel(
         ...indicator,
         value: clamp(indicator.value, indicator.min, indicator.max),
       })),
+    mapPlan: cityPlanForAsset(theme.map_asset),
     status: state.status,
     visualEvent,
   };

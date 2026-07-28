@@ -3,7 +3,7 @@
   "id": "civic-drainage-v1",
   "title": "The Republic: Drainage Mission",
   "description": "A stochastic civic-strategy scenario about getting a neglected neighbourhood drainage system repaired before time, money and energy run out.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "campaign": {
     "imports": [
       { "source_id": "civic_reputation", "target_id": "community_support", "multiplier": 0.25, "min": -15, "max": 15 },
@@ -117,6 +117,7 @@
     "primary_color": "#17324d",
     "accent_color": "#d88a2d",
     "background_color": "#e8e1cf",
+    "map_asset": "osm:new-delhi-india",
     "locations": [
       { "id": "neighborhood", "label": "Nayi Basti", "x": 18, "y": 68 },
       { "id": "drain", "label": "Blocked drain", "x": 36, "y": 72 },

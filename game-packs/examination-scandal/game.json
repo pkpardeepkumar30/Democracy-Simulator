@@ -3,7 +3,7 @@
   "id": "examination-scandal-v1",
   "title": "The Examination Scandal",
   "description": "Organize a lawful national accountability campaign after evidence shows that a public examination was leaked.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "campaign": {
     "imports": [
       { "source_id": "civic_reputation", "target_id": "community_support", "multiplier": 0.25, "min": -15, "max": 15 },
@@ -148,6 +148,7 @@
     "primary_color": "#312e5f",
     "accent_color": "#d94f70",
     "background_color": "#f1eef8",
+    "map_asset": "osm:beijing-china",
     "locations": [
       { "id": "campus", "label": "National University", "x": 18, "y": 68 },
       { "id": "ministry", "label": "Education Ministry", "institution_id": "education_ministry", "x": 62, "y": 36 },

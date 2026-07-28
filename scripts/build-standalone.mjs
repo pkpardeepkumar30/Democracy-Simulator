@@ -6,23 +6,29 @@ const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url))
 const read = (relativePath) => readFile(path.join(repositoryRoot, relativePath), 'utf8');
 const scriptSafe = (source) => source.replaceAll('</script>', '<\\/script>');
 
-const [shell, styles, packText, offlineApi, application] = await Promise.all([
+const [shell, styles, packText, cityPlansText, offlineApi, application] = await Promise.all([
   read('web/index.html'),
   read('web/styles.css'),
   read('game-packs/drainage/game.json'),
+  read('web/city-data/city-plans.json'),
   read('web/offline-api.js'),
   read('web/app.js'),
 ]);
 
 const pack = JSON.stringify(JSON.parse(packText), null, 2);
+const cityMapLibrary = JSON.parse(cityPlansText);
+const cityPlanBootstrap =
+  `globalThis.CivicCityMapLibrary=${JSON.stringify(cityMapLibrary)};` +
+  'globalThis.CivicCityPlans=Object.fromEntries(globalThis.CivicCityMapLibrary.plans.map((plan)=>[`osm:${plan.id}`,plan]));';
 const generated = shell
   .replace('  <link rel="manifest" href="/manifest.webmanifest" />\n', '')
   .replace('  <link rel="stylesheet" href="/styles.css" />', `<style>\n${styles}</style>`)
   .replace('Game state persists on the server', 'Game state persists in this browser')
   .replace(
     '  <script src="/city.bundle.js" defer></script>\n  <script src="/app.js" defer></script>',
-    `  <script type="application/json" id="embeddedGamePack">${scriptSafe(pack)}</script>\n` +
+      `  <script type="application/json" id="embeddedGamePack">${scriptSafe(pack)}</script>\n` +
       `  <script>${scriptSafe(offlineApi)}</script>\n` +
+      `  <script>${scriptSafe(cityPlanBootstrap)}</script>\n` +
       `  <script>${scriptSafe(application)}</script>`,
   );
 

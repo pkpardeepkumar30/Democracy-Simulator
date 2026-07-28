@@ -36,6 +36,10 @@ await page.evaluate((sessionId) => localStorage.setItem('civic-sim-session-id', 
 await page.reload({ waitUntil: 'networkidle' });
 const canvas = page.locator('#cityCanvasHost canvas');
 await canvas.waitFor({ state: 'visible', timeout: 15_000 });
+const attribution = await page.locator('.map-attribution').textContent();
+if (!attribution?.includes('New Delhi, India') || !attribution.includes('OpenStreetMap contributors')) {
+  throw new Error(`real-map attribution is missing: ${attribution}`);
+}
 if (await page.locator('#cityDomFallback').isVisible()) throw new Error('DOM fallback remained visible with Phaser active');
 if (await page.locator('.action-button').count() < 1) throw new Error('accessible DOM actions are missing');
 await page.screenshot({ path: path.join(outputDirectory, 'visual-city-desktop.png'), fullPage: true });
@@ -83,7 +87,11 @@ const generatedScenario = await json('/api/v1/scenarios/generate', {
   method: 'POST',
   body: JSON.stringify({
     seed: 20260721,
-    selections: { objective_type: 'business_land', world_region: 'east_asian_industrial_city' },
+    selections: {
+      objective_type: 'business_land',
+      world_region: 'east_asian_industrial_city',
+      city_plan: 'beijing_china',
+    },
     difficulty: 'standard',
     randomize_unspecified: true,
   }),
@@ -96,6 +104,9 @@ await page.evaluate((sessionId) => localStorage.setItem('civic-sim-session-id', 
 await page.reload({ waitUntil: 'networkidle' });
 await page.locator('#cityCanvasHost canvas').waitFor({ state: 'visible', timeout: 15_000 });
 if (await page.locator('#cityDomFallback').isVisible()) throw new Error('generated scenario fell back from Phaser');
+if (!(await page.locator('.map-attribution').textContent())?.includes('Beijing, China')) {
+  throw new Error('generated scenario did not use its selected Beijing city plan');
+}
 renderedScenarios.push(generatedScenario.id);
 
 await browser.close();

@@ -12,7 +12,36 @@ export type VisualTheme = {
   primary_color?: string;
   accent_color?: string;
   background_color?: string;
+  map_asset?: string | null;
   locations?: VisualLocation[];
+};
+
+export type CityMapFeature = {
+  kind: 'road' | 'rail' | 'water';
+  class: string;
+  name?: string;
+  points: [number, number][];
+};
+
+export type CityMapPlan = {
+  id: string;
+  city: string;
+  country: string;
+  label: string;
+  bbox: [number, number, number, number];
+  source_url: string;
+  extract_url: string;
+  features: CityMapFeature[];
+};
+
+export type CityMapLibrary = {
+  schema_version: number;
+  generated_at: string;
+  attribution: string;
+  extract_provider: string;
+  license: string;
+  license_url: string;
+  plans: CityMapPlan[];
 };
 
 export type VisualEvent = {
@@ -59,6 +88,7 @@ export type CityViewModel = {
   locations: CityLocationView[];
   playerLocationId: string | null;
   factors: { id: string; label: string; value: number; min: number; max: number }[];
+  mapPlan: CityMapPlan | null;
   status: PublicState['status'];
   visualEvent: VisualEvent | null;
 };
