@@ -6,5 +6,6 @@
 !web/dist/
 !web/dist/city.bundle.js
 .cache/
+.wrangler/
 **/__pycache__/
 *.tmp
