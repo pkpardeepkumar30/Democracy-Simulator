@@ -1,0 +1,35 @@
+# Cloud deployment uses a strict source allowlist.
+*
+!.gcloudignore
+!Dockerfile
+!Cargo.toml
+!Cargo.lock
+!src/
+!src/**
+!web/
+!web/**
+!game-packs/
+!game-packs/**
+
+# Build products, caches, tests, and local-only artifacts.
+target/
+.cache/
+**/node_modules/
+**/.expo/
+**/dist/
+**/test-results*/
+PLAY_WITHOUT_DOCKER.html
+*.log
+*.tmp
+
+# Never upload local credentials or private key material.
+**/.env
+**/.env.*
+**/*credentials*
+**/*secret*
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/*.jks
+**/*.keystore
