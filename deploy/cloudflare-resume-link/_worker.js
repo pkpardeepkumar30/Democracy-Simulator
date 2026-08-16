@@ -54,8 +54,21 @@ export default {
 
     if ((responseHeaders.get("content-type") || "").includes("text/html")) {
       let html = (await originResponse.text()).replaceAll(ORIGIN, PUBLIC_ORIGIN);
+      const headTags = [];
       if (!html.includes('name="google-site-verification"')) {
-        html = html.replace("</head>", `  ${VERIFICATION_TAG}\n</head>`);
+        headTags.push(VERIFICATION_TAG);
+      }
+      if (!html.includes('name="robots"')) {
+        headTags.push('<meta name="robots" content="index,follow,max-image-preview:large" />');
+      }
+      if (!html.includes('rel="canonical"')) {
+        headTags.push(`<link rel="canonical" href="${PUBLIC_ORIGIN}/" />`);
+      }
+      if (!html.includes('property="og:url"')) {
+        headTags.push(`<meta property="og:url" content="${PUBLIC_ORIGIN}/" />`);
+      }
+      if (headTags.length) {
+        html = html.replace("</head>", `  ${headTags.join("\n  ")}\n</head>`);
       }
       responseHeaders.delete("content-length");
       responseHeaders.delete("content-encoding");
