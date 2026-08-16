@@ -2,6 +2,8 @@
 
 A reusable, data-driven civic-simulation platform. The initial library contains three stochastic environments: repair a flooded ward, organize accountability after a national examination leak, and lawfully acquire land and approvals for a food-processing factory.
 
+The canonical public deployment is `https://the-republic.pages.dev/`. It exposes crawlable metadata, `robots.txt`, and `sitemap.xml`; submit `https://the-republic.pages.dev/sitemap.xml` in Google Search Console after ownership verification.
+
 The package contains:
 
 - A low-latency Rust game server using Axum and Tokio.

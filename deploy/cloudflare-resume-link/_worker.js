@@ -1,8 +1,25 @@
 const ORIGIN = "https://democracy-game-236938724273.europe-west1.run.app";
+const PUBLIC_ORIGIN = "https://the-republic.pages.dev";
+const VERIFICATION_TAG = '<meta name="google-site-verification" content="i3KkC0aZF8NUh1zQPaxYIZVNnvgiJY7iqLnGn6RDj08" />';
 
 export default {
   async fetch(request) {
     const publicUrl = new URL(request.url);
+
+    if (publicUrl.pathname === "/robots.txt") {
+      return new Response(
+        `User-agent: *\nAllow: /\nSitemap: ${PUBLIC_ORIGIN}/sitemap.xml\n`,
+        { headers: { "content-type": "text/plain; charset=utf-8" } },
+      );
+    }
+
+    if (publicUrl.pathname === "/sitemap.xml") {
+      return new Response(
+        `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>${PUBLIC_ORIGIN}/</loc>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n</urlset>\n`,
+        { headers: { "content-type": "application/xml; charset=utf-8" } },
+      );
+    }
+
     const originUrl = new URL(`${publicUrl.pathname}${publicUrl.search}`, ORIGIN);
     const headers = new Headers(request.headers);
 
@@ -33,6 +50,20 @@ export default {
           `${publicUrl.origin}${redirectUrl.pathname}${redirectUrl.search}${redirectUrl.hash}`,
         );
       }
+    }
+
+    if ((responseHeaders.get("content-type") || "").includes("text/html")) {
+      let html = (await originResponse.text()).replaceAll(ORIGIN, PUBLIC_ORIGIN);
+      if (!html.includes('name="google-site-verification"')) {
+        html = html.replace("</head>", `  ${VERIFICATION_TAG}\n</head>`);
+      }
+      responseHeaders.delete("content-length");
+      responseHeaders.delete("content-encoding");
+      return new Response(html, {
+        status: originResponse.status,
+        statusText: originResponse.statusText,
+        headers: responseHeaders,
+      });
     }
 
     return new Response(originResponse.body, {

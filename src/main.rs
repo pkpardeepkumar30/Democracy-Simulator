@@ -120,6 +120,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/styles.css", get(static_assets::styles_css))
         .route("/manifest.webmanifest", get(static_assets::manifest))
         .route("/sw.js", get(static_assets::service_worker))
+        .route("/robots.txt", get(static_assets::robots_txt))
+        .route("/sitemap.xml", get(static_assets::sitemap))
         .route("/favicon.ico", get(static_assets::favicon))
         .route("/api/v1/health", get(health))
         .route("/api/v1/scenario", get(get_scenario))
